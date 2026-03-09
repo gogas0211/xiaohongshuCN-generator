@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小红书文案生成器</title>
+    <style>
+      body { font-family: Arial, sans-serif; max-width: 840px; margin: 24px auto; padding: 0 12px; }
+      label { display: block; margin-top: 12px; font-weight: 600; }
+      input, textarea { width: 100%; padding: 8px; margin-top: 4px; }
+      button { margin-top: 16px; padding: 10px 16px; cursor: pointer; }
+      .result { margin-top: 24px; padding: 12px; border: 1px solid #ddd; border-radius: 8px; white-space: pre-wrap; }
+    </style>
+  </head>
+  <body>
+    <h1>小红书文案自动生成器</h1>
+
+    <label for="topic">topic</label>
+    <input id="topic" placeholder="例如：时间管理" />
+
+    <label for="audience">audience</label>
+    <input id="audience" placeholder="例如：大学生" />
+
+    <label for="objective">objective</label>
+    <input id="objective" placeholder="例如：提升学习效率" />
+
+    <label for="keywords">keywords（逗号分隔）</label>
+    <input id="keywords" placeholder="例如：番茄钟,复盘" />
+
+    <button id="generate-btn">生成文案</button>
+
+    <div id="result" class="result">点击“生成文案”后在这里展示结果。</div>
+
+    <script>
+      const btn = document.getElementById('generate-btn');
+      const result = document.getElementById('result');
+
+      btn.addEventListener('click', async () => {
+        const payload = {
+          topic: document.getElementById('topic').value,
+          audience: document.getElementById('audience').value,
+          objective: document.getElementById('objective').value,
+          keywords: document.getElementById('keywords').value,
+        };
+
+        const resp = await fetch('/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+
+        const data = await resp.json();
+        if (!resp.ok) {
+          result.textContent = `错误：${data.error || '请求失败'}`;
+          return;
+        }
+
+        result.textContent =
+          `【标题】\n${data.title}\n\n` +
+          `【开头】\n${data.opening}\n\n` +
+          `【正文】\n${data.body}\n\n` +
+          `【行动号召】\n${data.cta}\n\n` +
+          `【话题标签】\n${data.hashtags.join(' ')}`;
+      });
+    </script>
+  </body>
+</html>
