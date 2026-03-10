@@ -5,122 +5,62 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>小红书文案生成器</title>
     <style>
-      body { font-family: Arial, sans-serif; max-width: 900px; margin: 24px auto; padding: 0 12px; }
+      body { font-family: Arial, sans-serif; max-width: 840px; margin: 24px auto; padding: 0 12px; }
       label { display: block; margin-top: 12px; font-weight: 600; }
-      input { width: 100%; padding: 8px; margin-top: 4px; }
-      .btn-row { margin-top: 16px; display: flex; gap: 8px; flex-wrap: wrap; }
-      button { padding: 10px 16px; cursor: pointer; }
+      input, textarea { width: 100%; padding: 8px; margin-top: 4px; }
+      button { margin-top: 16px; padding: 10px 16px; cursor: pointer; }
       .result { margin-top: 24px; padding: 12px; border: 1px solid #ddd; border-radius: 8px; white-space: pre-wrap; }
-      .error { margin-top: 16px; color: #b00020; font-weight: 600; }
-      .multi { margin-top: 20px; }
-      .card { border: 1px solid #ddd; border-radius: 8px; padding: 10px; margin-top: 10px; white-space: pre-wrap; }
-      .best { border: 2px solid #ff7a00; background: #fff9f2; }
     </style>
   </head>
   <body>
     <h1>小红书文案自动生成器</h1>
 
-    <form id="post-form" action="/generate" method="post">
-      <label for="topic">topic</label>
-      <input id="topic" name="topic" placeholder="例如：时间管理" required />
+    <label for="topic">topic</label>
+    <input id="topic" placeholder="例如：时间管理" />
 
-      <label for="audience">audience</label>
-      <input id="audience" name="audience" placeholder="例如：大学生" required />
+    <label for="audience">audience</label>
+    <input id="audience" placeholder="例如：大学生" />
 
-      <label for="objective">objective</label>
-      <input id="objective" name="objective" placeholder="例如：提升学习效率" required />
+    <label for="objective">objective</label>
+    <input id="objective" placeholder="例如：提升学习效率" />
 
-      <label for="keywords">keywords（逗号分隔）</label>
-      <input id="keywords" name="keywords" placeholder="例如：番茄钟,复盘" />
+    <label for="keywords">keywords（逗号分隔）</label>
+    <input id="keywords" placeholder="例如：番茄钟,复盘" />
 
-      <div class="btn-row">
-        <button type="submit">生成文案</button>
-        <button type="button" id="generate-three-btn">生成3个版本</button>
-        <button type="button" id="generate-best-btn">生成10篇→选最好的</button>
-      </div>
-    </form>
+    <button id="generate-btn">生成文案</button>
 
-    {% if error %}
-      <div class="error">错误：{{ error }}</div>
-    {% endif %}
-
-    {% if result %}
-      <div class="result">【标题】
-{{ result.title }}
-
-【封面文案】
-{{ result.cover_text }}
-
-【开头】
-{{ result.opening }}
-
-【正文】
-{{ result.body }}
-
-【行动号召】
-{{ result.cta }}
-
-【话题标签】
-{{ result.hashtags | join(' ') }}</div>
-    {% endif %}
-
-    <div class="multi" id="multi-results"></div>
+    <div id="result" class="result">点击“生成文案”后在这里展示结果。</div>
 
     <script>
-      const btn3 = document.getElementById('generate-three-btn');
-      const btnBest = document.getElementById('generate-best-btn');
-      const multiBox = document.getElementById('multi-results');
+      const btn = document.getElementById('generate-btn');
+      const result = document.getElementById('result');
 
-      function collectPayload() {
-        return {
+      btn.addEventListener('click', async () => {
+        const payload = {
           topic: document.getElementById('topic').value,
           audience: document.getElementById('audience').value,
           objective: document.getElementById('objective').value,
           keywords: document.getElementById('keywords').value,
         };
-      }
 
-      function renderCard(item, indexLabel, cls = 'card') {
-        const card = document.createElement('div');
-        card.className = cls;
-        card.textContent = `${indexLabel}\n【标题】\n${item.title}\n\n【封面文案】\n${item.cover_text}\n\n【开头】\n${item.opening}\n\n【正文】\n${item.body}\n\n【行动号召】\n${item.cta}\n\n【话题标签】\n${item.hashtags.join(' ')}`;
-        return card;
-      }
-
-      btn3.addEventListener('click', async () => {
-        const resp = await fetch('/generate-multi', {
+        const resp = await fetch('/generate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(collectPayload()),
+          body: JSON.stringify(payload),
         });
 
         const data = await resp.json();
         if (!resp.ok) {
-          multiBox.innerHTML = `<div class="error">错误：${data.error || '请求失败'}</div>`;
+          result.textContent = `错误：${data.error || '请求失败'}`;
           return;
         }
 
-        multiBox.innerHTML = '<h2>3个版本文案</h2>';
-        data.versions.forEach((item, idx) => {
-          multiBox.appendChild(renderCard(item, `【版本 ${idx + 1}】`));
-        });
-      });
-
-      btnBest.addEventListener('click', async () => {
-        const resp = await fetch('/generate-best', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(collectPayload()),
-        });
-
-        const data = await resp.json();
-        if (!resp.ok) {
-          multiBox.innerHTML = `<div class="error">错误：${data.error || '请求失败'}</div>`;
-          return;
-        }
-
-        multiBox.innerHTML = '<h2>10篇候选中最优版本</h2>';
-        multiBox.appendChild(renderCard(data.best, '【最佳版本】', 'card best'));
+        result.textContent =
+          `【标题】\n${data.title}\n\n` +
+          `【开头】\n${data.opening}\n\n` +
+          `【正文】\n${data.body}\n\n` +
+          `【行动号召】\n${data.cta}\n\n` +
+          `【话题标签】\n${data.hashtags.join(' ')}`;
       });
     </script>
   </body>

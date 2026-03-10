@@ -6,9 +6,6 @@ from generator import (
     STYLE_SHARE,
     XiaohongshuRequest,
     generate_post,
-    generate_ten_posts,
-    generate_three_posts,
-    select_best_post,
 )
 from main import _parse_keywords
 
@@ -27,7 +24,6 @@ class TestGenerator(unittest.TestCase):
         post = generate_post(request)
 
         self.assertTrue(post.title)
-        self.assertTrue(post.cover_text)
         self.assertTrue(post.opening)
         self.assertTrue(post.body)
         self.assertTrue(post.cta)
@@ -65,7 +61,6 @@ class TestGenerator(unittest.TestCase):
         post2 = generate_post(request2)
 
         self.assertEqual(post1.title, post2.title)
-        self.assertEqual(post1.cover_text, post2.cover_text)
         self.assertEqual(post1.opening, post2.opening)
         self.assertEqual(post1.body, post2.body)
         self.assertEqual(post1.cta, post2.cta)
@@ -93,8 +88,7 @@ class TestGenerator(unittest.TestCase):
         post = generate_post(request)
         self.assertIn("#时间管理", post.hashtags)
         self.assertEqual(post.hashtags.count("#复盘"), 1)
-        self.assertLessEqual(len(post.hashtags), 8)
-        self.assertGreaterEqual(len(post.hashtags), 5)
+        self.assertLessEqual(len(post.hashtags), 6)
 
     def test_parse_keywords_support_chinese_comma(self):
         self.assertEqual(
@@ -127,7 +121,7 @@ class TestGenerator(unittest.TestCase):
                 seed=10,
             )
         )
-        self.assertIn("慢慢来", post.body)
+        self.assertIn("按自己的节奏", post.body)
 
     def test_style_seeding_contains_recommendation_tone(self):
         post = generate_post(
@@ -139,7 +133,7 @@ class TestGenerator(unittest.TestCase):
                 seed=10,
             )
         )
-        self.assertIn("轻松但有效", post.body)
+        self.assertIn("真心推荐", post.body)
 
     def test_post_contains_emojis(self):
         post = generate_post(
@@ -154,61 +148,30 @@ class TestGenerator(unittest.TestCase):
         content = post.title + post.opening + post.body + post.cta
         self.assertRegex(content, r"[\U0001F300-\U0001FAFF]")
 
-    def test_titles_have_at_least_ten_templates_effect(self):
-        req = XiaohongshuRequest(
-            topic="时间管理",
-            audience="大学生",
-            objective="提升效率",
-            tone=STYLE_GANHUO,
-            seed=1,
+    def test_titles_have_viral_hook_keywords(self):
+        post = generate_post(
+            XiaohongshuRequest(
+                topic="时间管理",
+                audience="大学生",
+                objective="提升效率",
+                tone=STYLE_GANHUO,
+                seed=1,
+            )
         )
-        titles = {generate_post(XiaohongshuRequest(**{**req.__dict__, "seed": i})).title for i in range(30)}
-        self.assertGreaterEqual(len(titles), 10)
+        hooks = ["收藏", "不走弯路", "看这一篇", "被问"]
+        self.assertTrue(any(hook in post.title for hook in hooks))
 
-    def test_body_contains_pain_real_summary(self):
+    def test_style_hashtags_more_natural(self):
         post = generate_post(
             XiaohongshuRequest(
                 topic="时间管理",
                 audience="大学生",
                 objective="提升效率",
                 tone=STYLE_SHARE,
-                seed=2,
+                seed=1,
             )
         )
-        self.assertTrue(any(flag in post.opening for flag in ["是不是也遇到过", "最扎心的是", "想做但总被打断"]))
-        self.assertIn("【真实经历】", post.body)
-        self.assertIn("【方法总结】", post.body)
-        self.assertIn("【总结】", post.body)
-
-    def test_generate_three_posts(self):
-        posts = generate_three_posts(
-            XiaohongshuRequest(
-                topic="时间管理",
-                audience="大学生",
-                objective="提升效率",
-                seed=10,
-            )
-        )
-        self.assertEqual(len(posts), 3)
-        self.assertTrue(all(post.cover_text for post in posts))
-
-
-    def test_generate_ten_posts_and_select_best(self):
-        posts = generate_ten_posts(
-            XiaohongshuRequest(
-                topic="时间管理",
-                audience="大学生",
-                objective="提升效率",
-                seed=21,
-            )
-        )
-        self.assertEqual(len(posts), 10)
-        best = select_best_post(posts)
-        self.assertIn(best, posts)
-
-    def test_select_best_post_rejects_empty(self):
-        with self.assertRaises(ValueError):
-            select_best_post([])
+        self.assertTrue(any(tag in post.hashtags for tag in ["#经验分享", "#一起成长"]))
 
 
 if __name__ == "__main__":

@@ -11,10 +11,6 @@ class _Request:
     json_data: Any = None
     form: dict[str, Any] | None = None
 
-    @property
-    def is_json(self) -> bool:
-        return self.json_data is not None
-
     def get_json(self, silent: bool = False):
         if self.json_data is None and not silent:
             raise ValueError("No JSON payload")
@@ -29,12 +25,6 @@ class _RequestProxy:
         if _current_request is None:
             return None
         return _current_request.get_json(silent=silent)
-
-    @property
-    def is_json(self) -> bool:
-        if _current_request is None:
-            return False
-        return _current_request.is_json
 
     @property
     def form(self) -> dict[str, Any]:
@@ -65,8 +55,7 @@ def jsonify(obj: Any) -> Response:
     return Response(json.dumps(obj, ensure_ascii=False), mimetype="application/json")
 
 
-def render_template(template_name: str, **_: Any) -> str:
-    # 轻量测试环境：返回模板原文即可满足当前测试断言。
+def render_template(template_name: str) -> str:
     template_path = Path("templates") / template_name
     return template_path.read_text(encoding="utf-8")
 
@@ -95,20 +84,18 @@ class Flask:
         app = self
 
         class _Client:
-            def open(self, path: str, method: str, json_payload: Any = None, form_data: Any = None):
+            def open(self, path: str, method: str, json_payload: Any = None):
                 global _current_request
                 handler = app._routes.get((method.upper(), path))
                 if handler is None:
                     return Response("Not Found", status_code=404)
 
-                _current_request = _Request(json_data=json_payload, form=form_data or {})
+                _current_request = _Request(json_data=json_payload, form={})
                 result = handler()
                 _current_request = None
 
                 if isinstance(result, tuple):
                     resp, status = result
-                    if isinstance(resp, str):
-                        resp = Response(resp, mimetype="text/html")
                     resp.status_code = status
                     return resp
                 if isinstance(result, Response):
@@ -120,10 +107,10 @@ class Flask:
             def get(self, path: str):
                 return self.open(path, "GET")
 
-            def post(self, path: str, json: Any = None, data: Any = None):
-                return self.open(path, "POST", json_payload=json, form_data=data)
+            def post(self, path: str, json: Any = None):
+                return self.open(path, "POST", json_payload=json)
 
         return _Client()
 
-    def run(self, host: str = "127.0.0.1", port: int = 5000, debug: bool = False):
-        print(f"Flask shim server on http://{host}:{port} (debug={debug})")
+    def run(self, debug: bool = False):
+        print("Development server stub: this local flask shim does not start a real HTTP server.")

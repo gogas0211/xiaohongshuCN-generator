@@ -49,7 +49,6 @@ def main() -> None:
 
     print("=" * 20 + " 小红书文案 " + "=" * 20)
     print(f"\n【标题】\n{post.title}")
-    print(f"\n【封面文案】\n{post.cover_text}")
     print(f"\n【开头】\n{post.opening}")
     print(f"\n【正文】\n{post.body}")
     if post.cta:

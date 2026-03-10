@@ -26,6 +26,8 @@ STYLE_ALIASES = {
 
 @dataclass
 class XiaohongshuRequest:
+    """小红书文案生成请求参数。"""
+
     topic: str
     audience: str
     objective: str
@@ -37,8 +39,9 @@ class XiaohongshuRequest:
 
 @dataclass
 class XiaohongshuPost:
+    """结构化小红书文案输出。"""
+
     title: str
-    cover_text: str
     opening: str
     body: str
     cta: str
@@ -67,40 +70,21 @@ def _normalize_style(tone: str) -> str:
     return STYLE_ALIASES.get(normalized, STYLE_SHARE)
 
 
-def _viral_title_templates(topic: str, audience: str, objective: str, style: str) -> List[str]:
-    style_prefix = {
-        STYLE_GANHUO: "实操版",
-        STYLE_SHARE: "亲测版",
-        STYLE_SEEDING: "种草版",
-    }[style]
-
-    return [
-        f"被问爆了🔥 {topic}这样做，{objective}真的快",
-        f"别再瞎试了！{topic}{style_prefix}，一篇讲透",
-        f"看这一篇就够✅ {audience}做{topic}的完整路线",
-        f"收藏率超高：{topic}从混乱到稳定的3步法",
-        f"我后悔没早点知道！{topic}原来可以这么轻松",
-        f"真的有用！{topic}让我明显更接近{objective}",
-        f"不走弯路版：{topic}高效执行清单（可直接照做）",
-        f"普通人也能上手：{topic}低门槛但高回报的方法",
-        f"这套方法太顶了✨ 我靠{topic}慢慢做到{objective}",
-        f"效率翻倍的关键：{topic}别靠意志力，靠流程",
-        f"近期最惊喜改变！{topic}让我状态稳定了",
-        f"从拖延到自律：{topic}真实复盘（含避坑）",
-    ]
-
-
 def _build_hashtags(style: str, topic: str, objective: str, audience: str, keywords: List[str]) -> List[str]:
-    """自动生成 5~8 个标签。"""
+    """生成更自然的 hashtags，控制数量并补充平台常见语义标签。"""
+
+    base_tags = [topic, objective]
+    if keywords:
+        base_tags.extend(keywords[:2])
+    # 人群标签放在后面，避免过度“生硬人群词”抢占前排。
+    base_tags.append(audience)
 
     style_tags = {
-        STYLE_GANHUO: ["方法论", "效率提升", "自我管理"],
-        STYLE_SHARE: ["经验分享", "真实经历", "一起成长"],
-        STYLE_SEEDING: ["亲测有效", "自用分享", "好用不踩雷"],
+        STYLE_GANHUO: ["学习方法", "效率提升"],
+        STYLE_SHARE: ["经验分享", "一起成长"],
+        STYLE_SEEDING: ["自用分享", "好用不踩雷"],
     }
-    fallback_tags = ["小红书文案", "内容创作", "个人成长", "执行力", "复盘"]
-
-    candidates = [topic, objective, audience] + keywords[:3] + style_tags[style] + fallback_tags
+    candidates = base_tags + style_tags[style]
 
     hashtags: List[str] = []
     seen = set()
@@ -110,97 +94,89 @@ def _build_hashtags(style: str, topic: str, objective: str, audience: str, keywo
             continue
         hashtags.append(f"#{tag}")
         seen.add(tag)
-        if len(hashtags) >= 8:
+        if len(hashtags) >= 6:
             break
-
-    while len(hashtags) < 5:
-        extra = fallback_tags[len(hashtags) % len(fallback_tags)]
-        tag = f"#{extra}"
-        if tag not in hashtags:
-            hashtags.append(tag)
-
     return hashtags
 
 
-def _build_prompt_blocks(style: str, topic: str, audience: str, objective: str, keywords: List[str]) -> dict[str, Sequence[str]]:
-    """爆款小红书 Prompt 算法：钩子标题→痛点共鸣→真实经历→方法总结→结尾总结→CTA。"""
-
-    keyword_line = f"我这段时间重点盯的是：{'、'.join(keywords)}。" if keywords else "先不聊抽象概念，直接讲可执行动作。"
-
-    pain_openings = [
-        f"你是不是也遇到过：明明想把{topic}做好，但总是三天热度、结果不稳定？",
-        f"最扎心的是，很多{audience}在{topic}上花了很多时间，却还是看不到明显变化。",
-        f"如果你也有“想做但总被打断”的困扰，这篇就是写给你的。",
-    ]
-
-    real_experience = [
-        "【真实经历】我之前也反复重开计划，工具越换越多，执行却总断档。",
-        "后来我把目标拆小到“今天就能完成”的粒度，连续两周后节奏才真正稳下来。",
-    ]
-
-    method_summary = [
-        "【方法总结】核心就三件事：先把目标写清、再把动作拆小、最后按天复盘。",
-        f"围绕“{objective}”做{topic}时，千万别追求一次做满，先把连续性做出来。",
-    ]
-
-    final_summary = [
-        "【总结】先稳定，再优化；先完成，再完美。这个顺序对普通人最友好。",
-        "当你开始每天都能推进一点点，结果就会在某个时间点突然变得很明显。",
-    ]
+def _build_style_blocks(style: str, topic: str, audience: str, objective: str, keywords: List[str]) -> dict[str, Sequence[str]]:
+    keyword_line = f"我自己会重点盯这几个关键词：{'、'.join(keywords)}。" if keywords else "这次不堆概念，直接给你能马上照做的步骤。"
 
     if style == STYLE_GANHUO:
-        body_lines = [
-            f"① 先定结果：把“{objective}”写成一句话，贴在每天都能看到的位置。",
-            f"② 再拆动作：把{topic}拆成10~20分钟的小任务，降低启动成本。",
-            "③ 做复盘：每天只记两件事——哪个动作有效、哪个动作该删。",
-            keyword_line,
-            *real_experience,
-            *method_summary,
-            *final_summary,
-            "这套方式不是玄学，是可复用的执行流程💪。",
-        ]
-    elif style == STYLE_SEEDING:
-        body_lines = [
-            f"先给你结果：我靠这套做{topic}后，明显更容易做到“{objective}”。",
-            "它最香的点是：门槛低、反馈快，忙的时候也能推进。",
-            "不会有强压迫感，反而越做越有掌控感。",
-            keyword_line,
-            *real_experience,
-            *method_summary,
-            *final_summary,
-            "如果你也在找“轻松但有效”的方法，这个真的可以试一周💖。",
-        ]
-    else:
-        body_lines = [
-            f"我以前总想一步到位，后来发现围绕“{objective}”慢慢推进更不累。",
-            f"现在我会给{topic}固定一个小时间，不求多，但求每天不断线。",
-            "状态不好的日子，就把目标缩小，先完成再优化，压力会小很多。",
-            keyword_line,
-            *real_experience,
-            *method_summary,
-            *final_summary,
-            "慢慢来，你会看到自己的变化是可累计的🌱。",
-        ]
+        return {
+            "titles": [
+                f"🔥{topic}真的别硬撑！3步直接做到{objective}",
+                f"看这一篇就够了✅ {audience}做{topic}的高效模板",
+                f"收藏率超高！{topic}实操清单，照做就能{objective}",
+            ],
+            "openings": [
+                f"今天不讲大道理，直接把我做{topic}最有效的流程给你📌。",
+                f"如果你也总在{topic}上卡住，这篇可以直接当执行清单。",
+            ],
+            "bodies": [
+                f"① 先把目标钉死：你现在要的就是“{objective}”，别一开始就分心。",
+                f"② 把{topic}拆小：每次只做一个动作，完成感会上来，执行就稳了。",
+                "③ 睡前复盘3分钟：保留有效动作，没效果的当场删掉。",
+                keyword_line,
+                "我自己就是靠这套从“想很多做很少”变成“每天都在推进”💪。",
+            ],
+            "ctas": [
+                "要不要我把这份模板做成可打印版？评论区留“模板”我就发📮",
+                "如果你想看进阶版（含避坑清单），点个收藏，我下篇继续拆✨",
+            ],
+        }
+
+    if style == STYLE_SEEDING:
+        return {
+            "titles": [
+                f"被问麻了😍 这个{topic}方法我真想安利给所有{audience}",
+                f"挖到宝了✨ 做{topic}这样安排，真的更容易{objective}",
+                f"近期最惊喜的改变！靠它做{topic}，轻松又上头",
+            ],
+            "openings": [
+                f"认真说，这个{topic}方法我已经连用一段时间，体验感太好了🚀。",
+                f"本来我也怕{topic}坚持不下来，结果这个做法真的让我改观了。",
+            ],
+            "bodies": [
+                f"先给结论：它让我更稳定地做到“{objective}”，而且不会有压迫感。",
+                f"核心思路是把{topic}做成“随手能开始”的动作，门槛越低越容易坚持。",
+                "最香的是反馈很快，你会明显感觉到：自己真的在变好。",
+                keyword_line,
+                "如果你也想找一个轻松但有效的方法，这个我真心推荐你试一周💖。",
+            ],
+            "ctas": [
+                "想看我完整流程（含翻车点）吗？留言“想抄作业”我就整理👇",
+                "被种草的话先收藏，按这个节奏做7天，你会看到区别🧾",
+            ],
+        }
 
     return {
-        "titles": _viral_title_templates(topic, audience, objective, style),
-        "cover_texts": [
-            f"{topic}\n3步上手\n{objective}",
-            f"{topic}避坑指南\n{audience}必看",
-            f"亲测有效\n{topic}\n执行模板",
-            f"别再硬撑\n{topic}\n这样做更稳",
+        "titles": [
+            f"普通人也能做到✨ 我是这样把{topic}慢慢做起来的",
+            f"最近变化最大的一件事：{topic}让我更容易{objective}",
+            f"写给{audience}的真心话：{topic}其实可以很轻松",
         ],
-        "openings": pain_openings,
-        "bodies": body_lines,
+        "openings": [
+            f"这篇就当朋友聊天，我把自己做{topic}时最真实的感受分享给你🤍。",
+            f"最近不少人问我{topic}怎么坚持，我把自己在用的小方法写清楚了。",
+        ],
+        "bodies": [
+            f"以前我总想一步到位，后来才发现围绕“{objective}”慢慢推进更不累。",
+            f"我现在会给{topic}留一个固定小时间，不求做很多，但求每天不断线。",
+            "状态不好的那天，我就把目标缩小一点，先完成再优化，心态会轻松很多。",
+            keyword_line,
+            "如果你也在这个阶段，别急，按自己的节奏来，真的会一点点变好🌱。",
+        ],
         "ctas": [
-            "看完有启发的话，点个赞+收藏；你想看哪类场景模板，评论区告诉我👇",
-            "如果你想要我把这套流程做成可直接套用的清单，留言“模板”我就发📮",
-            "这篇先帮你走通从0到1，下篇我继续拆“如何稳定坚持30天”✨",
+            "如果你也在实践类似方法，欢迎留言聊聊，我们可以互相打气💬",
+            "觉得这篇有用就先收藏，执行卡住时回来对照，会更有方向📒",
         ],
     }
 
 
 def generate_post(request: XiaohongshuRequest) -> XiaohongshuPost:
+    """根据输入参数生成一篇结构化小红书文案。"""
+
     topic = _require_non_empty("topic", request.topic)
     audience = _require_non_empty("audience", request.audience)
     objective = _require_non_empty("objective", request.objective)
@@ -209,60 +185,15 @@ def generate_post(request: XiaohongshuRequest) -> XiaohongshuPost:
     rng = random.Random(request.seed)
     keywords = _normalize_keywords(request.keywords)
     style = _normalize_style(tone)
-    blocks = _build_prompt_blocks(style, topic, audience, objective, keywords)
+    blocks = _build_style_blocks(style, topic, audience, objective, keywords)
 
     cta = "" if request.no_cta else _pick(rng, blocks["ctas"])
     hashtags = _build_hashtags(style, topic, objective, audience, keywords)
 
     return XiaohongshuPost(
         title=_pick(rng, blocks["titles"]),
-        cover_text=_pick(rng, blocks["cover_texts"]),
         opening=_pick(rng, blocks["openings"]),
         body="\n".join(blocks["bodies"]),
         cta=cta,
         hashtags=hashtags,
     )
-
-
-def _score_post(post: XiaohongshuPost) -> int:
-    score = 0
-    hook_words = ["收藏", "被问", "不走弯路", "效率", "惊喜", "讲透"]
-    score += sum(1 for word in hook_words if word in post.title) * 2
-    score += min(len(post.hashtags), 8)
-    score += 2 if "【总结】" in post.body else 0
-    score += 2 if "【真实经历】" in post.body else 0
-    score += 2 if post.cta else 0
-    score += 1 if post.cover_text else 0
-    return score
-
-
-def _generate_n_posts(request: XiaohongshuRequest, n: int) -> List[XiaohongshuPost]:
-    posts: List[XiaohongshuPost] = []
-    base_seed = request.seed
-    for idx in range(n):
-        seed = None if base_seed is None else base_seed + idx
-        variant = XiaohongshuRequest(
-            topic=request.topic,
-            audience=request.audience,
-            objective=request.objective,
-            tone=request.tone,
-            keywords=list(request.keywords),
-            no_cta=request.no_cta,
-            seed=seed,
-        )
-        posts.append(generate_post(variant))
-    return posts
-
-
-def generate_three_posts(request: XiaohongshuRequest) -> List[XiaohongshuPost]:
-    return _generate_n_posts(request, 3)
-
-
-def generate_ten_posts(request: XiaohongshuRequest) -> List[XiaohongshuPost]:
-    return _generate_n_posts(request, 10)
-
-
-def select_best_post(posts: List[XiaohongshuPost]) -> XiaohongshuPost:
-    if not posts:
-        raise ValueError("posts 不能为空")
-    return max(posts, key=_score_post)
