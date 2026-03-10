@@ -2,198 +2,280 @@ from __future__ import annotations
 
 import random
 from dataclasses import dataclass, field
-from typing import Iterable, List, Optional, Sequence
+from typing import List, Optional
 
 
-DEFAULT_TONE = "真诚"
-STYLE_GANHUO = "干货型"
-STYLE_SHARE = "亲切分享型"
-STYLE_SEEDING = "爆款种草型"
-
-STYLE_ALIASES = {
-    "干货": STYLE_GANHUO,
-    "干货型": STYLE_GANHUO,
-    "亲切": STYLE_SHARE,
-    "亲切分享": STYLE_SHARE,
-    "亲切分享型": STYLE_SHARE,
-    "分享": STYLE_SHARE,
-    "爆款": STYLE_SEEDING,
-    "种草": STYLE_SEEDING,
-    "爆款种草": STYLE_SEEDING,
-    "爆款种草型": STYLE_SEEDING,
-}
+DEFAULT_TONE = "真实分享"
 
 
 @dataclass
 class XiaohongshuRequest:
-    """小红书文案生成请求参数。"""
-
     topic: str
     audience: str
     objective: str
-    tone: str = DEFAULT_TONE
     keywords: List[str] = field(default_factory=list)
+    tone: str = DEFAULT_TONE
     no_cta: bool = False
     seed: Optional[int] = None
 
 
 @dataclass
 class XiaohongshuPost:
-    """结构化小红书文案输出。"""
-
     title: str
     opening: str
     body: str
     cta: str
     hashtags: List[str]
 
+    def to_text(self) -> str:
+        parts = [
+            "【标题】",
+            self.title,
+            "",
+            "【开头】",
+            self.opening,
+            "",
+            "【正文】",
+            self.body,
+        ]
+        if self.cta:
+            parts.extend(["", "【行动号召】", self.cta])
+        parts.extend(["", "【话题标签】", " ".join(self.hashtags)])
+        return "\n".join(parts)
 
-def _normalize_keywords(keywords: Optional[Iterable[str]]) -> List[str]:
-    if not keywords:
-        return []
-    return [str(keyword).strip() for keyword in keywords if str(keyword).strip()]
+
+def _normalize_keywords(keywords: List[str]) -> List[str]:
+    seen = set()
+    result = []
+    for kw in keywords:
+        clean = kw.strip()
+        if clean and clean not in seen:
+            seen.add(clean)
+            result.append(clean)
+    return result
 
 
-def _pick(rng: random.Random, choices: Sequence[str]) -> str:
+def _pick(rng: random.Random, choices: List[str]) -> str:
     return choices[rng.randrange(len(choices))]
 
 
-def _require_non_empty(field_name: str, value: str) -> str:
-    normalized = value.strip()
-    if not normalized:
-        raise ValueError(f"{field_name} 不能为空")
-    return normalized
+def _title_templates(topic: str) -> List[str]:
+    return [
+        f"买{topic}一年，我终于明白为什么很多人后悔",
+        f"第一批做{topic}的人，现在都怎么样了？",
+        f"{topic}到底值不值？真实体验一次说清楚",
+        f"很多人劝我别碰{topic}，但我还是试了",
+        f"如果重新开始，我一定先搞懂{topic}",
+        f"关于{topic}，我踩过的坑比你想得多",
+        f"做了{topic}之后，我才发现很多人都误会了",
+        f"{topic}不是不能做，而是很多人一开始就做错了",
+        f"我花了很久才明白：{topic}真的别急着下结论",
+        f"想做{topic}的人，建议先看完这篇再决定",
+    ]
 
 
-def _normalize_style(tone: str) -> str:
-    normalized = (tone or "").strip()
-    return STYLE_ALIASES.get(normalized, STYLE_SHARE)
+def _opening_templates(topic: str) -> List[str]:
+    return [
+        f"最近很多朋友都在问我一件事：{topic}到底靠不靠谱？",
+        f"说实话，我一开始做{topic}的时候，也纠结了很久。",
+        f"如果再让我选一次，我会更早认真研究{topic}这件事。",
+        f"买之前我以为{topic}会很简单，实际体验后才发现完全不是一回事。",
+        f"很多人对{topic}其实有误解，真正用过之后感受会完全不一样。",
+        f"关于{topic}，网上说法很多，但真正有用的经验并不多。",
+    ]
 
 
-def _build_hashtags(style: str, topic: str, objective: str, audience: str, keywords: List[str]) -> List[str]:
-    """生成更自然的 hashtags，控制数量并补充平台常见语义标签。"""
-
-    base_tags = [topic, objective]
-    if keywords:
-        base_tags.extend(keywords[:2])
-    # 人群标签放在后面，避免过度“生硬人群词”抢占前排。
-    base_tags.append(audience)
-
-    style_tags = {
-        STYLE_GANHUO: ["学习方法", "效率提升"],
-        STYLE_SHARE: ["经验分享", "一起成长"],
-        STYLE_SEEDING: ["自用分享", "好用不踩雷"],
-    }
-    candidates = base_tags + style_tags[style]
-
-    hashtags: List[str] = []
-    seen = set()
-    for part in candidates:
-        tag = part.replace(" ", "")
-        if not tag or tag in seen:
-            continue
-        hashtags.append(f"#{tag}")
-        seen.add(tag)
-        if len(hashtags) >= 6:
-            break
-    return hashtags
+def _experience_templates(topic: str, audience: str) -> List[str]:
+    return [
+        f"我自己接触{topic}已经有一段时间了，最明显的感受是：很多事情只有亲自试过才知道值不值。",
+        f"如果你和我一样，属于{audience}，那你大概率也会在刚开始时被各种说法弄得更犹豫。",
+        f"我原本以为只要开始做{topic}就会马上见效，后来才发现真正重要的是长期体验和细节成本。",
+        f"我身边也有几位朋友在做{topic}，大家共同的感受是：优点确实明显，但坑也真的存在。",
+    ]
 
 
-def _build_style_blocks(style: str, topic: str, audience: str, objective: str, keywords: List[str]) -> dict[str, Sequence[str]]:
-    keyword_line = f"我自己会重点盯这几个关键词：{'、'.join(keywords)}。" if keywords else "这次不堆概念，直接给你能马上照做的步骤。"
+def _pros_templates(topic: str, keywords: List[str]) -> List[str]:
+    kw_text = "、".join(keywords[:3]) if keywords else "成本、体验、效率"
+    return [
+        f"先说让我最满意的地方。围绕{kw_text}这几个点，{topic}确实有它很香的一面。",
+        f"真正体验下来，{topic}的优势不是嘴上说说，而是日常使用里会明显感觉到轻松很多。",
+        f"如果只看实际感受，{topic}在不少场景里确实比我预期更友好。",
+    ]
 
-    if style == STYLE_GANHUO:
-        return {
-            "titles": [
-                f"🔥{topic}真的别硬撑！3步直接做到{objective}",
-                f"看这一篇就够了✅ {audience}做{topic}的高效模板",
-                f"收藏率超高！{topic}实操清单，照做就能{objective}",
-            ],
-            "openings": [
-                f"今天不讲大道理，直接把我做{topic}最有效的流程给你📌。",
-                f"如果你也总在{topic}上卡住，这篇可以直接当执行清单。",
-            ],
-            "bodies": [
-                f"① 先把目标钉死：你现在要的就是“{objective}”，别一开始就分心。",
-                f"② 把{topic}拆小：每次只做一个动作，完成感会上来，执行就稳了。",
-                "③ 睡前复盘3分钟：保留有效动作，没效果的当场删掉。",
-                keyword_line,
-                "我自己就是靠这套从“想很多做很少”变成“每天都在推进”💪。",
-            ],
-            "ctas": [
-                "要不要我把这份模板做成可打印版？评论区留“模板”我就发📮",
-                "如果你想看进阶版（含避坑清单），点个收藏，我下篇继续拆✨",
-            ],
-        }
 
-    if style == STYLE_SEEDING:
-        return {
-            "titles": [
-                f"被问麻了😍 这个{topic}方法我真想安利给所有{audience}",
-                f"挖到宝了✨ 做{topic}这样安排，真的更容易{objective}",
-                f"近期最惊喜的改变！靠它做{topic}，轻松又上头",
-            ],
-            "openings": [
-                f"认真说，这个{topic}方法我已经连用一段时间，体验感太好了🚀。",
-                f"本来我也怕{topic}坚持不下来，结果这个做法真的让我改观了。",
-            ],
-            "bodies": [
-                f"先给结论：它让我更稳定地做到“{objective}”，而且不会有压迫感。",
-                f"核心思路是把{topic}做成“随手能开始”的动作，门槛越低越容易坚持。",
-                "最香的是反馈很快，你会明显感觉到：自己真的在变好。",
-                keyword_line,
-                "如果你也想找一个轻松但有效的方法，这个我真心推荐你试一周💖。",
-            ],
-            "ctas": [
-                "想看我完整流程（含翻车点）吗？留言“想抄作业”我就整理👇",
-                "被种草的话先收藏，按这个节奏做7天，你会看到区别🧾",
-            ],
-        }
+def _cons_templates(topic: str) -> List[str]:
+    return [
+        f"但我也想说实话，{topic}并不是完全没有问题，有些地方很多人开始之前根本不会注意。",
+        f"不过客观说，{topic}也有让人纠结的地方，尤其是刚开始接触时会更明显。",
+        f"如果你只看优点，很容易冲动决定，但{topic}的几个现实问题一定要提前想清楚。",
+    ]
 
-    return {
-        "titles": [
-            f"普通人也能做到✨ 我是这样把{topic}慢慢做起来的",
-            f"最近变化最大的一件事：{topic}让我更容易{objective}",
-            f"写给{audience}的真心话：{topic}其实可以很轻松",
-        ],
-        "openings": [
-            f"这篇就当朋友聊天，我把自己做{topic}时最真实的感受分享给你🤍。",
-            f"最近不少人问我{topic}怎么坚持，我把自己在用的小方法写清楚了。",
-        ],
-        "bodies": [
-            f"以前我总想一步到位，后来才发现围绕“{objective}”慢慢推进更不累。",
-            f"我现在会给{topic}留一个固定小时间，不求做很多，但求每天不断线。",
-            "状态不好的那天，我就把目标缩小一点，先完成再优化，心态会轻松很多。",
-            keyword_line,
-            "如果你也在这个阶段，别急，按自己的节奏来，真的会一点点变好🌱。",
-        ],
-        "ctas": [
-            "如果你也在实践类似方法，欢迎留言聊聊，我们可以互相打气💬",
-            "觉得这篇有用就先收藏，执行卡住时回来对照，会更有方向📒",
-        ],
-    }
+
+def _summary_templates(topic: str, audience: str) -> List[str]:
+    return [
+        f"所以如果你是{audience}，我会觉得：{topic}不是不能做，而是一定要先想清楚自己的真实需求。",
+        f"总结下来，{topic}到底值不值，不是看别人怎么说，而是看它是不是真的适合你的生活方式。",
+        f"说到底，{topic}没有绝对答案，关键是你更在意省钱、体验，还是长期稳定性。",
+    ]
+
+
+def _cta_templates(topic: str) -> List[str]:
+    return [
+        f"如果你也在纠结{topic}，可以先收藏这篇，后面慢慢对照看。",
+        f"你现在更倾向继续了解{topic}，还是已经准备做决定了？评论区聊聊。",
+        f"如果你也有关于{topic}的真实经历，欢迎留言，我想看看大家的感受是不是一样。",
+        f"这类内容如果你还想继续看，我可以再整理一版更具体的避坑清单。",
+    ]
+
+
+def _build_body(rng: random.Random, req: XiaohongshuRequest) -> str:
+    topic = req.topic.strip()
+    audience = req.audience.strip()
+    keywords = _normalize_keywords(req.keywords)
+
+    experience = _pick(rng, _experience_templates(topic, audience))
+    pros_intro = _pick(rng, _pros_templates(topic, keywords))
+    cons_intro = _pick(rng, _cons_templates(topic))
+    summary = _pick(rng, _summary_templates(topic, audience))
+
+    pros_points = [
+        "1. 真实使用门槛没有想象中那么高，适应之后会轻松很多。",
+        "2. 只要场景匹配，长期体验往往比一开始担心的更稳定。",
+        "3. 如果你比较在意日常成本和使用感受，这一点会非常明显。",
+    ]
+
+    cons_points = [
+        "1. 前期信息很多，容易被各种说法带偏，反而更难判断。",
+        "2. 不同人的使用场景差别很大，别人的“真香”不一定完全适合你。",
+        "3. 如果忽略了一些现实条件，后面可能会有落差感。",
+    ]
+
+    body_parts = [
+        experience,
+        "",
+        pros_intro,
+        *pros_points,
+        "",
+        cons_intro,
+        *cons_points,
+        "",
+        summary,
+    ]
+    return "\n".join(body_parts)
+
+
+def _build_hashtags(req: XiaohongshuRequest) -> List[str]:
+    topic = req.topic.strip()
+    audience = req.audience.strip()
+    keywords = _normalize_keywords(req.keywords)
+
+    tags = []
+
+    def add_tag(text: str) -> None:
+        clean = text.strip().replace(" ", "")
+        if not clean:
+            return
+        tag = f"#{clean}"
+        if tag not in tags:
+            tags.append(tag)
+
+    add_tag(topic)
+
+    generic = [
+        "经验分享",
+        "真实体验",
+        "避坑指南",
+        "收藏备用",
+    ]
+    for tag in generic:
+        add_tag(tag)
+
+    if audience:
+        add_tag(audience)
+
+    for kw in keywords[:4]:
+        add_tag(kw)
+
+    return tags[:8]
 
 
 def generate_post(request: XiaohongshuRequest) -> XiaohongshuPost:
-    """根据输入参数生成一篇结构化小红书文案。"""
-
-    topic = _require_non_empty("topic", request.topic)
-    audience = _require_non_empty("audience", request.audience)
-    objective = _require_non_empty("objective", request.objective)
-    tone = (request.tone or "").strip() or DEFAULT_TONE
+    if not request.topic or not request.topic.strip():
+        raise ValueError("topic 不能为空")
+    if not request.audience or not request.audience.strip():
+        raise ValueError("audience 不能为空")
+    if not request.objective or not request.objective.strip():
+        raise ValueError("objective 不能为空")
 
     rng = random.Random(request.seed)
-    keywords = _normalize_keywords(request.keywords)
-    style = _normalize_style(tone)
-    blocks = _build_style_blocks(style, topic, audience, objective, keywords)
+    topic = request.topic.strip()
 
-    cta = "" if request.no_cta else _pick(rng, blocks["ctas"])
-    hashtags = _build_hashtags(style, topic, objective, audience, keywords)
+    title = _pick(rng, _title_templates(topic))
+    opening = _pick(rng, _opening_templates(topic))
+    body = _build_body(rng, request)
+    cta = "" if request.no_cta else _pick(rng, _cta_templates(topic))
+    hashtags = _build_hashtags(request)
 
     return XiaohongshuPost(
-        title=_pick(rng, blocks["titles"]),
-        opening=_pick(rng, blocks["openings"]),
-        body="\n".join(blocks["bodies"]),
+        title=title,
+        opening=opening,
+        body=body,
         cta=cta,
         hashtags=hashtags,
     )
+
+
+def generate_three_posts(request: XiaohongshuRequest) -> List[XiaohongshuPost]:
+    base_seed = request.seed or 1
+    posts = []
+    for i in range(3):
+        req = XiaohongshuRequest(
+            topic=request.topic,
+            audience=request.audience,
+            objective=request.objective,
+            keywords=list(request.keywords),
+            tone=request.tone,
+            no_cta=request.no_cta,
+            seed=base_seed + i,
+        )
+        posts.append(generate_post(req))
+    return posts
+
+
+def generate_ten_posts(request: XiaohongshuRequest) -> List[XiaohongshuPost]:
+    base_seed = request.seed or 1
+    posts = []
+    for i in range(10):
+        req = XiaohongshuRequest(
+            topic=request.topic,
+            audience=request.audience,
+            objective=request.objective,
+            keywords=list(request.keywords),
+            tone=request.tone,
+            no_cta=request.no_cta,
+            seed=base_seed + i,
+        )
+        posts.append(generate_post(req))
+    return posts
+
+
+def _score_post(post: XiaohongshuPost) -> int:
+    score = 0
+
+    title_rules = ["后悔", "值不值", "误会", "先看完", "踩过的坑", "到底"]
+    for rule in title_rules:
+        if rule in post.title:
+            score += 3
+
+    score += min(len(post.hashtags), 8)
+    score += 2 if "真实" in post.body else 0
+    score += 2 if "很多人" in post.opening else 0
+    score += 2 if "评论区" in post.cta or "留言" in post.cta else 0
+
+    return score
+
+
+def select_best_post(posts: List[XiaohongshuPost]) -> XiaohongshuPost:
+    if not posts:
+        raise ValueError("posts 不能为空")
+    return max(posts, key=_score_post)

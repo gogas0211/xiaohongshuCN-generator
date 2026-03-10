@@ -1,11 +1,12 @@
 import unittest
 
 from generator import (
-    STYLE_GANHUO,
-    STYLE_SEEDING,
-    STYLE_SHARE,
+    DEFAULT_TONE,
     XiaohongshuRequest,
     generate_post,
+    generate_ten_posts,
+    generate_three_posts,
+    select_best_post,
 )
 from main import _parse_keywords
 
@@ -13,11 +14,10 @@ from main import _parse_keywords
 class TestGenerator(unittest.TestCase):
     def test_generate_post_contains_all_sections(self):
         request = XiaohongshuRequest(
-            topic="时间管理",
-            audience="大学生",
-            objective="提升学习效率",
-            tone="干货",
-            keywords=["番茄钟", "复盘"],
+            topic="新能源车",
+            audience="上班族",
+            objective="降低通勤成本",
+            keywords=["用车成本", "真实体验"],
             seed=7,
         )
 
@@ -27,7 +27,12 @@ class TestGenerator(unittest.TestCase):
         self.assertTrue(post.opening)
         self.assertTrue(post.body)
         self.assertTrue(post.cta)
-        self.assertGreaterEqual(len(post.hashtags), 3)
+        self.assertGreaterEqual(len(post.hashtags), 5)
+        self.assertLessEqual(len(post.hashtags), 8)
+
+    def test_default_tone(self):
+        req = XiaohongshuRequest(topic="学习", audience="学生", objective="提分")
+        self.assertEqual(req.tone, DEFAULT_TONE)
 
     def test_no_cta_flag(self):
         request = XiaohongshuRequest(
@@ -78,100 +83,64 @@ class TestGenerator(unittest.TestCase):
 
     def test_hashtags_deduplicate_and_trim_spaces(self):
         request = XiaohongshuRequest(
-            topic=" 时间 管理 ",
-            audience="大学生",
-            objective="提升 学习效率",
-            keywords=["复盘", "复盘", "  ", "时间 管理"],
+            topic=" 新能源 车 ",
+            audience="上班族",
+            objective="降低通勤成本",
+            keywords=["用车成本", "用车成本", "  ", " 真实体验 "],
             seed=1,
         )
 
         post = generate_post(request)
-        self.assertIn("#时间管理", post.hashtags)
-        self.assertEqual(post.hashtags.count("#复盘"), 1)
-        self.assertLessEqual(len(post.hashtags), 6)
+        self.assertIn("#新能源车", post.hashtags)
+        self.assertEqual(post.hashtags.count("#用车成本"), 1)
+        self.assertLessEqual(len(post.hashtags), 8)
+        self.assertGreaterEqual(len(post.hashtags), 5)
 
     def test_parse_keywords_support_chinese_comma(self):
-        self.assertEqual(
-            _parse_keywords("效率，学习方法, 复盘 ,"),
-            ["效率", "学习方法", "复盘"],
-        )
+        self.assertEqual(_parse_keywords("效率，学习方法, 复盘 ,"), ["效率", "学习方法", "复盘"])
 
     def test_parse_keywords_handles_none(self):
         self.assertEqual(_parse_keywords(None), [])
 
-    def test_style_ganhuo_contains_practical_tone(self):
+    def test_post_contains_viral_structure(self):
         post = generate_post(
             XiaohongshuRequest(
-                topic="学习规划",
-                audience="大学生",
-                objective="提分",
-                tone=STYLE_GANHUO,
-                seed=10,
-            )
-        )
-        self.assertIn("①", post.body)
-
-    def test_style_share_contains_warm_tone(self):
-        post = generate_post(
-            XiaohongshuRequest(
-                topic="运动习惯",
+                topic="新能源车",
                 audience="上班族",
-                objective="保持状态",
-                tone=STYLE_SHARE,
-                seed=10,
+                objective="降低通勤成本",
+                seed=2,
             )
         )
-        self.assertIn("按自己的节奏", post.body)
+        self.assertTrue(any(flag in post.opening for flag in ["很多朋友", "纠结", "误解", "网上说法很多"]))
+        self.assertIn("1.", post.body)
+        self.assertIn("2.", post.body)
 
-    def test_style_seeding_contains_recommendation_tone(self):
-        post = generate_post(
-            XiaohongshuRequest(
-                topic="早睡",
-                audience="熬夜党",
-                objective="精神更好",
-                tone=STYLE_SEEDING,
-                seed=10,
-            )
-        )
-        self.assertIn("真心推荐", post.body)
+    def test_titles_have_at_least_ten_templates_effect(self):
+        req = XiaohongshuRequest(topic="时间管理", audience="大学生", objective="提升效率", seed=1)
+        titles = {
+            generate_post(XiaohongshuRequest(**{**req.__dict__, "seed": i})).title
+            for i in range(30)
+        }
+        self.assertGreaterEqual(len(titles), 10)
 
-    def test_post_contains_emojis(self):
-        post = generate_post(
-            XiaohongshuRequest(
-                topic="时间管理",
-                audience="大学生",
-                objective="提升效率",
-                tone=STYLE_SHARE,
-                seed=3,
-            )
+    def test_generate_three_posts(self):
+        posts = generate_three_posts(
+            XiaohongshuRequest(topic="时间管理", audience="大学生", objective="提升效率", seed=10)
         )
-        content = post.title + post.opening + post.body + post.cta
-        self.assertRegex(content, r"[\U0001F300-\U0001FAFF]")
+        self.assertEqual(len(posts), 3)
+        self.assertTrue(all(post.title for post in posts))
 
-    def test_titles_have_viral_hook_keywords(self):
-        post = generate_post(
-            XiaohongshuRequest(
-                topic="时间管理",
-                audience="大学生",
-                objective="提升效率",
-                tone=STYLE_GANHUO,
-                seed=1,
-            )
+    def test_generate_ten_posts_and_select_best(self):
+        posts = generate_ten_posts(
+            XiaohongshuRequest(topic="时间管理", audience="大学生", objective="提升效率", seed=21)
         )
-        hooks = ["收藏", "不走弯路", "看这一篇", "被问"]
-        self.assertTrue(any(hook in post.title for hook in hooks))
+        self.assertEqual(len(posts), 10)
+        best = select_best_post(posts)
+        self.assertIn(best, posts)
 
-    def test_style_hashtags_more_natural(self):
-        post = generate_post(
-            XiaohongshuRequest(
-                topic="时间管理",
-                audience="大学生",
-                objective="提升效率",
-                tone=STYLE_SHARE,
-                seed=1,
-            )
-        )
-        self.assertTrue(any(tag in post.hashtags for tag in ["#经验分享", "#一起成长"]))
+    def test_select_best_post_rejects_empty(self):
+        with self.assertRaises(ValueError):
+            select_best_post([])
 
 
 if __name__ == "__main__":
