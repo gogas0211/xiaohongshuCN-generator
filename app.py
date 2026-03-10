@@ -2,8 +2,13 @@ from __future__ import annotations
 
 from flask import Flask, jsonify, render_template, request
 
-from generator import XiaohongshuRequest, generate_post, generate_ten_posts, generate_three_posts, select_best_post
-
+from generator import (
+    XiaohongshuRequest,
+    generate_post,
+    generate_ten_posts,
+    generate_three_posts,
+    select_best_post,
+)
 
 app = Flask(__name__)
 
@@ -34,14 +39,19 @@ def _post_to_dict(post):
 
 @app.get("/")
 def index():
-    return render_template("index.html", result=None, error=None, multi_results=None, best_result=None)
+    return render_template(
+        "index.html",
+        result=None,
+        error=None,
+        multi_results=None,
+        best_result=None,
+    )
 
 
 @app.post("/generate")
 def generate():
     is_json = request.is_json
     payload = request.get_json(silent=True) or request.form
-
     req = _build_request(payload)
 
     try:
@@ -49,13 +59,26 @@ def generate():
     except ValueError as exc:
         if is_json:
             return jsonify({"error": str(exc)}), 400
-        return render_template("index.html", result=None, error=str(exc), multi_results=None, best_result=None), 400
+        return render_template(
+            "index.html",
+            result=None,
+            error=str(exc),
+            multi_results=None,
+            best_result=None,
+        ), 400
 
     result = _post_to_dict(post)
 
     if is_json:
         return jsonify(result)
-    return render_template("index.html", result=result, error=None, multi_results=None, best_result=None)
+
+    return render_template(
+        "index.html",
+        result=result,
+        error=None,
+        multi_results=None,
+        best_result=None,
+    )
 
 
 @app.post("/generate-multi")

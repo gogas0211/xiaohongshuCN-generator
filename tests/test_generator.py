@@ -73,7 +73,13 @@ class TestGenerator(unittest.TestCase):
 
     def test_empty_required_fields_raise_error(self):
         with self.assertRaises(ValueError):
-            generate_post(XiaohongshuRequest(topic="   ", audience="大学生", objective="提升学习效率"))
+            generate_post(
+                XiaohongshuRequest(
+                    topic="   ",
+                    audience="大学生",
+                    objective="提升学习效率",
+                )
+            )
 
     def test_hashtags_deduplicate_and_trim_spaces(self):
         request = XiaohongshuRequest(
@@ -111,7 +117,10 @@ class TestGenerator(unittest.TestCase):
 
     def test_titles_have_at_least_ten_templates_effect(self):
         req = XiaohongshuRequest(topic="时间管理", audience="大学生", objective="提升效率", seed=1)
-        titles = {generate_post(XiaohongshuRequest(**{**req.__dict__, "seed": i})).title for i in range(30)}
+        titles = {
+            generate_post(XiaohongshuRequest(**{**req.__dict__, "seed": i})).title
+            for i in range(30)
+        }
         self.assertGreaterEqual(len(titles), 10)
 
     def test_generate_three_posts(self):
