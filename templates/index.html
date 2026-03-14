@@ -237,36 +237,12 @@ function buildPrompt(count, inp) {
   var tpl = '{"title":"","opening":"","body":"","cta":"","hashtags":[]}';
   var arr = [];
   for (var i = 0; i < count; i++) arr.push(tpl);
-  return '你现在是一个真实的普通小红书用户，用自己的话分享真实体验，绝对不是AI，不是营销号。\n\n'
-    + '内容类型：' + selectedType + '\n'
-    + '目标人群：' + selectedAudience + '\n'
-    + '主题/产品：' + inp.topic + '\n'
-    + '核心卖点：' + inp.objective + '\n'
-    + '关键词：' + inp.keywords + '\n'
-    + '文案风格：' + inp.tone + '\n\n'
-    + '请生成' + count + '篇文案，必须遵守以下所有要求：\n\n'
-    + '【去AI化要求（最重要）】\n'
-    + '- 句子长短随意不均匀，有时一句很长有时就几个字\n'
-    + '- 多用口语：哈哈哈、呜呜、啊啊啊、真的绝了、不行了、救命\n'
-    + '- 禁止用首先其次最后、综上所述、总的来说这类词\n'
-    + '- 加入具体生活场景：那天在地铁上、我室友问我、男朋友说\n'
-    + '- 数字要模糊：用了大概十几天而不是使用14天后\n'
-    + '- 加一两句小吐槽或自我怀疑，不完美才真实\n'
-    + '- 情绪要有起伏，不要一直正面积极\n'
-    + '- 段落长短不均匀，不要整整齐齐\n\n'
-    + '【合规要求（必须遵守）】\n'
-    + '- 绝对不能出现：治疗、根治、特效、第一、最好、100%等绝对化词汇\n'
-    + '- 用辅助调理、改善不适、感觉好多了等合规表达\n'
-    + '- 不能有医疗声称\n\n'
-    + '【标题要求】每篇用不同风格，口语化：\n'
-    + '1. 折腾好久终于找到了！！\n'
-    + '2. 用了差不多一个月，真的有点不一样了\n'
-    + '3. 本来不抱希望的，结果...\n'
-    + '4. 闺蜜问我最近状态怎么这么好\n'
-    + '5. 贵的用完了，反而开始回购这个\n\n'
-    + '话题标签：8-10个，大标签和精准小标签混合\n\n'
-    + '严格用JSON格式返回，不要有任何多余文字：\n'
-    + '{"posts":[' + arr.join(',') + ']}';
+  var p = '小红书真人分享，非AI非营销。';
+  p += '类型:'+selectedType+' 人群:'+selectedAudience+' 产品:'+inp.topic+' 卖点:'+inp.objective+' 关键词:'+inp.keywords+' 风格:'+inp.tone+'。';
+  p += '生成'+count+'篇，要求：口语化句子长短不一；用哈哈/呜呜/救命等口语；禁用首先其次最后；加生活场景细节；数字模糊如十几天；有吐槽和情绪起伏；禁用治疗根治特效最好等绝对词；合规用感觉好多了/改善不适。';
+  p += '标题每篇不同风格：痛点型/数字型/反转型/共鸣型/好奇型。';
+  p += '标签8-10个。只返回JSON不要多余文字：{"posts":['+arr.join(',')+ ']}';
+  return p;
 }
 
 function buildScoringPrompt(posts, inp) {
@@ -299,13 +275,13 @@ async function callGemini(prompt) {
   localStorage.setItem('xhs_api_key', apiKey);
 
   var resp = await fetch(
-    'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + apiKey,
+    'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + apiKey,
     {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
         contents: [{parts: [{text: prompt}]}],
-        generationConfig: {maxOutputTokens: 4000, temperature: 1.0}
+        generationConfig: {maxOutputTokens: 8000, temperature: 0.9}
       })
     }
   );
@@ -437,6 +413,8 @@ async function generateBest() {
     var batch1 = await callGemini(buildPrompt(5, inp));
     if (!batch1 || !Array.isArray(batch1.posts)) throw new Error('第1批生成失败，请重试');
     setStep(steps, 1);
+
+    await new Promise(function(r){ setTimeout(r, 8000); });
 
     var batch2 = await callGemini(buildPrompt(5, inp));
     if (!batch2 || !Array.isArray(batch2.posts)) throw new Error('第2批生成失败，请重试');
