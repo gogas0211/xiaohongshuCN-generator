@@ -3,69 +3,78 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>瑶医壮医养生文案生成器</title>
+  <title>小红书爆款文案生成器</title>
   <style>
     *{box-sizing:border-box;margin:0;padding:0;}
-    body{font-family:'PingFang SC','Hiragino Sans GB',Arial,sans-serif;background:#f5f0e8;min-height:100vh;padding:24px 12px;}
+    body{font-family:'PingFang SC','Hiragino Sans GB',Arial,sans-serif;background:#fff5f7;min-height:100vh;padding:24px 12px;}
     .container{max-width:720px;margin:0 auto;}
-    h1{font-size:21px;font-weight:700;color:#8b4513;margin-bottom:4px;}
-    .subtitle{font-size:13px;color:#a0856a;margin-bottom:24px;}
-    .card{background:#fff;border-radius:16px;padding:20px;margin-bottom:16px;box-shadow:0 2px 12px rgba(139,69,19,0.08);}
-    .card-title{font-size:13px;font-weight:600;color:#8b4513;margin-bottom:14px;}
+    h1{font-size:22px;font-weight:700;color:#ff2442;margin-bottom:4px;}
+    .subtitle{font-size:13px;color:#999;margin-bottom:24px;}
+    .card{background:#fff;border-radius:16px;padding:20px;margin-bottom:16px;box-shadow:0 2px 12px rgba(255,36,66,0.06);}
+    .card-title{font-size:13px;font-weight:600;color:#ff2442;margin-bottom:14px;}
     label{display:block;font-size:13px;color:#666;margin-bottom:4px;margin-top:12px;}
     label:first-of-type{margin-top:0;}
-    input,textarea,select{width:100%;padding:10px 12px;border:1px solid #e8d5c0;border-radius:10px;font-size:14px;color:#333;background:#fff;outline:none;transition:border 0.2s;}
-    input:focus,textarea:focus,select:focus{border-color:#8b4513;}
+    input,textarea,select{width:100%;padding:10px 12px;border:1px solid #ffe0e6;border-radius:10px;font-size:14px;color:#333;background:#fff;outline:none;transition:border 0.2s;}
+    input:focus,textarea:focus,select:focus{border-color:#ff2442;}
     textarea{resize:vertical;min-height:72px;line-height:1.6;}
     input[type="password"]{letter-spacing:2px;}
     .key-row{display:flex;gap:8px;align-items:center;}
     .key-row input{flex:1;}
-    .key-toggle{font-size:12px;color:#8b4513;cursor:pointer;white-space:nowrap;padding:10px 0;}
-    .type-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px;}
-    .type-btn{padding:10px;border:1.5px solid #e8d5c0;border-radius:10px;font-size:13px;color:#666;cursor:pointer;text-align:center;transition:all 0.15s;background:#fff;}
-    .type-btn.active{border-color:#8b4513;color:#8b4513;background:#f9f3ec;font-weight:600;}
-    .scene-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:4px;}
-    .scene-btn{padding:8px;border:1.5px solid #e8d5c0;border-radius:10px;font-size:12px;color:#666;cursor:pointer;text-align:center;transition:all 0.15s;background:#fff;}
-    .scene-btn.active{border-color:#8b4513;color:#8b4513;background:#f9f3ec;font-weight:600;}
+    .key-toggle{font-size:12px;color:#ff2442;cursor:pointer;white-space:nowrap;padding:10px 0;}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px;}
+    .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:4px;}
+    .sel-btn{padding:10px;border:1.5px solid #ffe0e6;border-radius:10px;font-size:13px;color:#666;cursor:pointer;text-align:center;transition:all 0.15s;background:#fff;}
+    .sel-btn.active{border-color:#ff2442;color:#ff2442;background:#fff5f7;font-weight:600;}
+    .sel-btn.sm{padding:8px;font-size:12px;}
     .btn-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
-    .generate-btn{width:100%;padding:12px 8px;color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:600;cursor:pointer;transition:opacity 0.15s;}
-    .generate-btn:hover{opacity:0.9;}
-    .generate-btn:disabled{opacity:0.5;cursor:not-allowed;}
-    .generate-btn.p1{background:#8b4513;}
-    .generate-btn.p2{background:#a0522d;}
-    .generate-btn.p3{background:#6b3410;}
-    .result-card{background:#fff;border-radius:16px;padding:20px;margin-bottom:16px;box-shadow:0 2px 12px rgba(139,69,19,0.1);border-left:4px solid #8b4513;display:none;}
+    .gen-btn{width:100%;padding:12px 8px;color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:600;cursor:pointer;transition:opacity 0.15s;}
+    .gen-btn:hover{opacity:0.9;}
+    .gen-btn:disabled{opacity:0.5;cursor:not-allowed;}
+    .gen-btn.p1{background:#ff2442;}
+    .gen-btn.p2{background:#ff6b81;}
+    .gen-btn.p3{background:#ff6b35;}
+    .result-card{background:#fff;border-radius:16px;padding:20px;margin-bottom:16px;box-shadow:0 2px 12px rgba(255,36,66,0.08);border-left:4px solid #ff2442;display:none;}
     .result-card.show{display:block;}
-    .result-card.best{border-left:4px solid #6b3410;box-shadow:0 4px 20px rgba(107,52,16,0.15);}
-    .best-badge{display:inline-block;background:#8b4513;color:#fff;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;margin-bottom:12px;}
+    .result-card.best{border-left:4px solid #ff6b35;box-shadow:0 4px 20px rgba(255,107,53,0.15);}
+    .best-badge{display:inline-block;background:#ff6b35;color:#fff;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;margin-bottom:12px;}
     .score-bar{display:flex;align-items:center;gap:8px;margin:8px 0 14px;}
     .score-label{font-size:12px;color:#999;white-space:nowrap;}
-    .score-track{flex:1;height:6px;background:#e8d5c0;border-radius:3px;}
-    .score-fill{height:6px;background:#8b4513;border-radius:3px;}
-    .score-num{font-size:12px;font-weight:600;color:#8b4513;white-space:nowrap;}
-    .score-reason{font-size:12px;color:#999;line-height:1.6;margin-bottom:12px;padding:8px 12px;background:#f9f3ec;border-radius:8px;}
-    .result-label{font-size:12px;color:#8b4513;font-weight:600;margin-bottom:6px;margin-top:14px;}
+    .score-track{flex:1;height:6px;background:#ffe0e6;border-radius:3px;}
+    .score-fill{height:6px;background:#ff2442;border-radius:3px;}
+    .score-num{font-size:12px;font-weight:600;color:#ff2442;white-space:nowrap;}
+    .score-reason{font-size:12px;color:#999;line-height:1.6;margin-bottom:12px;padding:8px 12px;background:#fff5f7;border-radius:8px;}
+    .result-label{font-size:12px;color:#ff2442;font-weight:600;margin-bottom:6px;margin-top:14px;}
     .result-label:first-of-type{margin-top:0;}
     .result-content{font-size:14px;color:#333;line-height:1.8;white-space:pre-wrap;}
-    .result-title{font-size:17px;font-weight:700;color:#8b4513;line-height:1.5;}
+    .result-title{font-size:17px;font-weight:700;color:#ff2442;line-height:1.5;}
     .hashtags{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;}
-    .tag{background:#f9f3ec;color:#8b4513;font-size:12px;padding:4px 10px;border-radius:20px;border:1px solid #e8d5c0;}
-    .copy-btn{margin-top:14px;padding:10px 20px;border:1.5px solid #8b4513;border-radius:10px;color:#8b4513;background:#fff;font-size:13px;cursor:pointer;font-weight:600;}
-    .copy-btn:hover{background:#f9f3ec;}
-    .show-all-btn{width:100%;padding:12px;border:1.5px dashed #e8d5c0;border-radius:12px;color:#8b4513;background:transparent;font-size:13px;cursor:pointer;margin-bottom:16px;}
-    .show-all-btn:hover{background:#f9f3ec;}
+    .tag{background:#fff5f7;color:#ff2442;font-size:12px;padding:4px 10px;border-radius:20px;border:1px solid #ffe0e6;}
+    .warn-box{background:#fff8e6;border:1px solid #ffd666;border-radius:8px;padding:10px 12px;margin-top:10px;font-size:12px;color:#996600;line-height:1.8;display:none;}
+    .warn-box.show{display:block;}
+    .warn-title{font-weight:600;margin-bottom:4px;}
+    .copy-btn{margin-top:14px;padding:10px 20px;border:1.5px solid #ff2442;border-radius:10px;color:#ff2442;background:#fff;font-size:13px;cursor:pointer;font-weight:600;}
+    .copy-btn:hover{background:#fff5f7;}
+    .show-all-btn{width:100%;padding:12px;border:1.5px dashed #ffb3c0;border-radius:12px;color:#ff2442;background:transparent;font-size:13px;cursor:pointer;margin-bottom:16px;}
+    .show-all-btn:hover{background:#fff5f7;}
     .candidates-section{display:none;}
     .candidates-section.open{display:block;}
-    .candidate-card{background:#fff;border-radius:12px;padding:16px;margin-bottom:10px;border:1px solid #e8d5c0;cursor:pointer;}
-    .candidate-card:hover{background:#f9f3ec;}
+    .candidate-card{background:#fff;border-radius:12px;padding:16px;margin-bottom:10px;border:1px solid #ffe0e6;cursor:pointer;}
+    .candidate-card:hover{background:#fff5f7;}
     .candidate-num{font-size:11px;color:#999;margin-bottom:6px;}
     .candidate-title{font-size:14px;font-weight:600;color:#333;margin-bottom:6px;}
     .candidate-preview{font-size:12px;color:#999;line-height:1.6;}
-    .loading{text-align:center;padding:24px;color:#8b4513;font-size:14px;display:none;}
+    .history-section{margin-top:8px;}
+    .history-item{display:flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid #ffe0e6;border-radius:10px;margin-bottom:6px;cursor:pointer;background:#fff;}
+    .history-item:hover{background:#fff5f7;}
+    .history-text{flex:1;font-size:13px;color:#333;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .history-time{font-size:11px;color:#ccc;white-space:nowrap;}
+    .history-del{font-size:12px;color:#ccc;cursor:pointer;padding:2px 6px;}
+    .history-del:hover{color:#ff2442;}
+    .loading{text-align:center;padding:24px;color:#ff2442;font-size:14px;display:none;}
     .loading.show{display:block;}
     .loading-steps{margin-top:12px;}
     .loading-step{font-size:12px;color:#ccc;margin:4px 0;}
-    .loading-step.active{color:#8b4513;}
+    .loading-step.active{color:#ff2442;}
     .loading-step.done{color:#52c41a;}
     .dot{animation:blink 1.2s infinite;}
     .dot:nth-child(2){animation-delay:0.2s;}
@@ -73,14 +82,16 @@
     @keyframes blink{0%,80%,100%{opacity:0;}40%{opacity:1;}}
     .error{background:#fff0f0;border:1px solid #ffb3b3;border-radius:10px;padding:12px;color:#cc0000;font-size:13px;margin-top:12px;display:none;}
     .error.show{display:block;}
-    .tip{background:#f9f3ec;border-radius:10px;padding:10px 12px;font-size:12px;color:#a0856a;line-height:1.6;margin-top:8px;}
-    .divider{font-size:11px;color:#a0856a;margin:8px 0 4px;font-weight:600;}
+    .tip{background:#fff5f7;border-radius:10px;padding:10px 12px;font-size:12px;color:#999;line-height:1.6;margin-top:8px;}
+    .sec-label{font-size:11px;color:#ff2442;font-weight:600;margin:12px 0 6px;}
+    .clear-history{font-size:12px;color:#ccc;cursor:pointer;float:right;}
+    .clear-history:hover{color:#ff2442;}
   </style>
 </head>
 <body>
 <div class="container">
-  <h1>🌿 瑶医壮医养生文案生成器</h1>
-  <p class="subtitle">非遗传承 · 体验感描述 · 科学科普 · 去AI化</p>
+  <h1>🌸 小红书爆款文案生成器</h1>
+  <p class="subtitle">Gemini 驱动 · 去AI化 · 违禁词检测 · 历史记录</p>
 
   <div class="card">
     <div class="card-title">🔑 API 设置</div>
@@ -89,189 +100,193 @@
       <input type="password" id="apiKey" placeholder="AIzaSy..."/>
       <span class="key-toggle" id="toggleBtn" onclick="toggleKey()">显示</span>
     </div>
-    <div class="tip">Key 仅保存在你的浏览器本地，不会上传到任何服务器。</div>
+    <div class="tip">Key 仅保存在你的浏览器本地，不会上传到任何服务器。免费额度每天可用。</div>
   </div>
 
   <div class="card">
-    <div class="card-title">🌿 产品类型</div>
-    <div class="type-grid">
-      <div class="type-btn active" onclick="selectType(this,'药浴')">🛁 瑶医药浴</div>
-      <div class="type-btn" onclick="selectType(this,'养生茶饮')">🍵 养生茶饮</div>
-      <div class="type-btn" onclick="selectType(this,'壮医康复')">💆 壮医康复</div>
-      <div class="type-btn" onclick="selectType(this,'壮锦文化')">🧵 壮锦文化</div>
+    <div class="card-title">✏️ 内容设置</div>
+
+    <div class="sec-label">内容类型</div>
+    <div class="grid2">
+      <div class="sel-btn active" onclick="selectType(this,'种草测评')">🛍️ 种草测评</div>
+      <div class="sel-btn" onclick="selectType(this,'生活方式')">✨ 生活方式</div>
+      <div class="sel-btn" onclick="selectType(this,'经验分享')">💡 经验分享</div>
+      <div class="sel-btn" onclick="selectType(this,'好物推荐')">⭐ 好物推荐</div>
     </div>
 
-    <div class="divider" style="margin-top:16px;">人群场景</div>
-    <div class="scene-grid">
-      <div class="scene-btn active" onclick="selectScene(this,'产后康复')">👶 产后康复</div>
-      <div class="scene-btn" onclick="selectScene(this,'妇科调理')">🌸 妇科调理</div>
-      <div class="scene-btn" onclick="selectScene(this,'少儿健康')">🧒 少儿健康</div>
-      <div class="scene-btn" onclick="selectScene(this,'男性养生')">💪 男性养生</div>
-      <div class="scene-btn" onclick="selectScene(this,'银发养生')">👴 银发养生</div>
-      <div class="scene-btn" onclick="selectScene(this,'旅游体验')">🗺️ 旅游体验</div>
+    <div class="sec-label" style="margin-top:14px;">目标人群</div>
+    <div class="grid3">
+      <div class="sel-btn sm active" onclick="selectAudience(this,'女生')">👩 女生</div>
+      <div class="sel-btn sm" onclick="selectAudience(this,'男生')">👨 男生</div>
+      <div class="sel-btn sm" onclick="selectAudience(this,'宝妈')">👶 宝妈</div>
+      <div class="sel-btn sm" onclick="selectAudience(this,'学生党')">📚 学生党</div>
+      <div class="sel-btn sm" onclick="selectAudience(this,'职场人')">💼 职场人</div>
+      <div class="sel-btn sm" onclick="selectAudience(this,'银发族')">👴 银发族</div>
     </div>
 
-    <label>补充说明（可选）</label>
-    <textarea id="extra" placeholder="例如：主打祛湿、产品是足浴包、客人反馈睡眠改善明显..."></textarea>
+    <label>主题 / 产品</label>
+    <input type="text" id="topic" placeholder="例如：韩国护肤品 COSRX 蜗牛霜"/>
+
+    <label>核心卖点 / 想传达的感受</label>
+    <textarea id="objective" placeholder="例如：亲测有效、平价好用、敏感肌也能用、半个月皮肤变好了"></textarea>
+
+    <label>关键词（逗号分隔）</label>
+    <input type="text" id="keywords" placeholder="例如：平价好物,护肤,敏感肌,素颜"/>
 
     <label>文案风格</label>
     <select id="tone">
-      <option value="真实体验分享">真实体验分享（最受欢迎）</option>
-      <option value="文化科普">文化科普风</option>
-      <option value="素人种草">素人种草风</option>
-      <option value="银发关怀">银发关怀风（子女视角）</option>
-      <option value="旅游打卡">旅游打卡风</option>
+      <option value="真实闺蜜分享">真实闺蜜分享（最受欢迎）</option>
+      <option value="专业测评">专业测评风</option>
+      <option value="搞笑自嘲">搞笑自嘲风</option>
+      <option value="精致生活">精致生活风</option>
+      <option value="素人逆袭">素人逆袭风</option>
     </select>
   </div>
 
   <div class="card">
     <div class="card-title">🚀 生成选项</div>
     <div class="btn-grid">
-      <button class="generate-btn p1" onclick="generate(1)" id="btn1">生成 1 篇</button>
-      <button class="generate-btn p2" onclick="generate(3)" id="btn3">生成 3 篇</button>
-      <button class="generate-btn p3" onclick="generateBest()" id="btn10">✨ 10篇AI选优</button>
+      <button class="gen-btn p1" onclick="generate(1)" id="btn1">生成 1 篇</button>
+      <button class="gen-btn p2" onclick="generate(3)" id="btn3">生成 3 篇</button>
+      <button class="gen-btn p3" onclick="generateBest()" id="btn10">✨ 10篇AI选优</button>
     </div>
-    <div class="tip" style="margin-top:12px;">✨ 「10篇AI选优」生成10篇候选，AI评分选出最适合瑶医壮医场景的爆款，耗时约40~60秒。</div>
+    <div class="tip" style="margin-top:12px;">✨ 「10篇AI选优」生成10篇候选，AI评分选出爆款概率最高的，耗时约30~60秒。</div>
   </div>
 
   <div class="loading" id="loading">
-    <p>正在生成养生文案<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></p>
+    <p>AI 正在创作爆款文案<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></p>
     <div class="loading-steps" id="loadingSteps"></div>
   </div>
   <div class="error" id="error"></div>
   <div id="results"></div>
+
+  <div class="card" id="historyCard" style="display:none;">
+    <div class="card-title">
+      📋 历史记录
+      <span class="clear-history" onclick="clearHistory()">清空</span>
+    </div>
+    <div class="history-section" id="historyList"></div>
+  </div>
 </div>
 
 <script>
-var selectedType = '药浴';
-var selectedScene = '产后康复';
+var selectedType = '种草测评';
+var selectedAudience = '女生';
+
+var BANNED_WORDS = [
+  '治疗','根治','特效','药到病除','包治','神效','立竿见影',
+  '第一','最好','最强','唯一','顶级','极品','100%',
+  '无副作用','纯天然','无毒','绝对安全',
+  '减肥药','瘦身药','溶脂','燃脂神器',
+  '美白针','祛斑根治','永久','一劳永逸',
+  '医院同款','医生推荐','临床验证'
+];
 
 function selectType(el, type) {
-  document.querySelectorAll('.type-btn').forEach(function(b){ b.classList.remove('active'); });
+  document.querySelectorAll('.sel-btn:not(.sm)').forEach(function(b){ b.classList.remove('active'); });
   el.classList.add('active');
   selectedType = type;
 }
 
-function selectScene(el, scene) {
-  document.querySelectorAll('.scene-btn').forEach(function(b){ b.classList.remove('active'); });
+function selectAudience(el, audience) {
+  document.querySelectorAll('.sel-btn.sm').forEach(function(b){ b.classList.remove('active'); });
   el.classList.add('active');
-  selectedScene = scene;
+  selectedAudience = audience;
 }
 
 function toggleKey() {
   var inp = document.getElementById('apiKey');
   var btn = document.getElementById('toggleBtn');
-  if (inp.type === 'password') { inp.type = 'text'; btn.textContent = '隐藏'; }
-  else { inp.type = 'password'; btn.textContent = '显示'; }
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+  btn.textContent = inp.type === 'password' ? '显示' : '隐藏';
 }
 
 window.onload = function() {
-  var saved = localStorage.getItem('yaoyao_api_key');
+  var saved = localStorage.getItem('xhs_api_key');
   if (saved) document.getElementById('apiKey').value = saved;
+  renderHistory();
 };
+
+function getInputs() {
+  return {
+    topic: document.getElementById('topic').value.trim(),
+    objective: document.getElementById('objective').value.trim(),
+    keywords: document.getElementById('keywords').value.trim(),
+    tone: document.getElementById('tone').value
+  };
+}
 
 function validate() {
   var apiKey = document.getElementById('apiKey').value.trim();
+  var inp = getInputs();
   if (!apiKey) { showError('请先填写 API Key'); return false; }
+  if (!inp.topic) { showError('请填写主题/产品'); return false; }
+  if (!inp.objective) { showError('请填写核心卖点'); return false; }
   return true;
 }
 
-function buildKnowledge() {
-  var knowledge = {
-    '药浴': {
-      '产后康复': '瑶族产后药浴"三天出工"是千年传承，产妇泡浴后三天可恢复体力。草药通过温热作用促进血液循环，帮助排出恶露，缓解腰酸背痛，驱散寒湿。体验感：热气腾腾的杉木桶，草药香气弥漫，泡进去全身暖意从脚底升起，汗珠慢慢渗出，像是把月子里积累的所有疲惫都泡走了。',
-      '妇科调理': '瑶浴对宫寒、痛经有辅助调理作用，艾叶、益母草等草药通过皮肤渗透，温暖子宫，改善手脚冰凉。体验感：药香浓郁，泡进去小腹暖暖的，像一双手在轻轻按摩，经期前后泡尤其舒服。',
-      '少儿健康': '瑶浴少儿配方以钩藤、九节茶等温和草药为主，帮助小朋友祛湿健脾，改善睡眠，皮肤瘙痒也有辅助缓解。体验感：草药味道清淡，水色淡绿，小朋友泡完皮肤软软的，睡觉特别香。',
-      '男性养生': '男性药浴以祛风除湿、舒筋活络为主，半枫荷、透骨香等草药缓解久坐腰痛、运动疲劳。体验感：泡进去十分钟背部开始发热，酸痛感慢慢松开，出来整个人轻盈很多。',
-      '银发养生': '老年人风湿关节痛、腰腿痛适合瑶浴调理，透骨香、钩藤等草药祛风除湿，改善关节不适。体验感：热水配草药，关节泡开了，老人家说像年轻了十岁。',
-      '旅游体验': '瑶族药浴是国家级非物质文化遗产，2008年入选。在杉木桶里泡一次正宗瑶浴，是来广西必体验的项目。体验感：古朴的木桶，神秘的草药，热气中感受千年瑶族智慧。'
-    },
-    '养生茶饮': {
-      '产后康复': '月子期养生茶，以益母草、红枣、枸杞等为基础，帮助产后排恶露、补气血、促进恢复。口感温和甘甜，每天一杯暖身暖心。',
-      '妇科调理': '暖宫养颜茶，艾叶、红糖、生姜等配伍，经期前后饮用，改善痛经宫寒。喝下去小腹暖暖的，比热水袋更舒服。',
-      '少儿健康': '小儿健脾茶，山楂、麦芽、陈皮等助消化，改善积食厌食。口味酸甜，小朋友接受度高。',
-      '男性养生': '壮腰固肾茶，杜仲、黑豆、枸杞等补肾强腰，适合久坐熬夜的现代男性。',
-      '银发养生': '老年养生茶，黄芪、党参、红枣等益气养血，增强免疫力，每天一杯，子女最放心的礼物。',
-      '旅游体验': '广西特色养生茶，选用当地道地药材，带一包回家，把南方的草药香气带走。'
-    },
-    '壮医康复': {
-      '产后康复': '壮医经筋疗法通过疏通经筋，帮助产后恢复体态，改善腰背疼痛。',
-      '妇科调理': '壮医目诊辨体质，针对不同体质给予个性化调理方案。',
-      '银发养生': '壮医针灸结合经筋疗法，对老年人腰腿痛、关节炎有辅助改善作用。',
-      '男性养生': '壮医特色疗法缓解职业劳损，适合长期久坐、体力劳动者。',
-      '少儿健康': '壮医小儿推拿，温和无创，改善小儿消化、睡眠问题。',
-      '旅游体验': '体验正宗壮医疗法，感受广西少数民族医学智慧。'
-    },
-    '壮锦文化': {
-      '旅游体验': '壮锦是广西壮族自治区的非物质文化遗产，以棉线为经纬，手工织造，图案精美，色彩鲜艳，是壮族文化的活化石。',
-      '银发养生': '一件壮锦，承载着壮族老匠人几十年的技艺，送给父母的礼物，不只是布料，是文化的温度。',
-      '产后康复': '壮锦背带背孩子，是壮族妈妈的传统，舒适透气，承载着民族的母爱。',
-      '妇科调理': '壮锦制作本身就是一种静心疗愈，每一根线都是专注当下的修行。',
-      '少儿健康': '给孩子穿一件壮锦，让他从小感受民族文化的根。',
-      '男性养生': '壮锦文创产品，送给重要的人，独一无二的民族礼物。'
-    }
-  };
-  var k = knowledge[selectedType] || {};
-  return k[selectedScene] || '瑶医壮医是广西少数民族传统医学，历史悠久，以草药外用为特色，注重整体调理。';
+function checkBannedWords(text) {
+  var found = [];
+  BANNED_WORDS.forEach(function(w) {
+    if (text.indexOf(w) !== -1) found.push(w);
+  });
+  return found;
 }
 
-function buildPrompt(count, extra, tone) {
-  var knowledge = buildKnowledge();
+function buildPrompt(count, inp) {
   var tpl = '{"title":"","opening":"","body":"","cta":"","hashtags":[]}';
   var arr = [];
   for (var i = 0; i < count; i++) arr.push(tpl);
-
-  return '你现在是一个真实体验过瑶医壮医养生的普通用户，用自己的话分享感受，不是AI，不是营销号。\n\n'
-    + '产品类型：' + selectedType + '\n'
-    + '人群场景：' + selectedScene + '\n'
-    + '文案风格：' + tone + '\n'
-    + (extra ? '补充说明：' + extra + '\n' : '')
-    + '\n【背景知识】\n' + knowledge + '\n\n'
-    + '请生成' + count + '篇小红书文案，必须做到：\n\n'
-    + '【体验感描述要求（最重要）】\n'
-    + '- 调动五感：视觉（颜色/光线）、嗅觉（草药香气）、触觉（水温/皮肤感受）、身体感受（暖意/放松/疲惫消散）\n'
-    + '- 有具体的时间线：泡进去第几分钟有什么感觉，出来之后怎么样\n'
-    + '- 前后对比：泡之前是什么状态，泡完之后变化\n'
-    + '- 情绪变化：从期待/怀疑到惊喜/放松的真实心理\n\n'
-    + '【科学科普要求】\n'
-    + '- 用通俗语言解释草药原理，不用专业术语\n'
-    + '- 引用非遗传承背景增加可信度\n'
-    + '- 不能有医疗声称，不能说"治疗""根治""特效"\n'
-    + '- 用"辅助调理""改善不适""身体更舒服"等合规表达\n\n'
-    + '【去AI化要求】\n'
-    + '- 句子长短随意，有口语感\n'
-    + '- 加入具体生活细节和场景\n'
-    + '- 允许小吐槽和自我怀疑，显得真实\n'
-    + '- 禁用"首先其次最后""综上所述"等AI惯用词\n'
-    + '- 适当用emoji但不过多\n\n'
+  return '你现在是一个真实的普通小红书用户，用自己的话分享真实体验，绝对不是AI，不是营销号。\n\n'
+    + '内容类型：' + selectedType + '\n'
+    + '目标人群：' + selectedAudience + '\n'
+    + '主题/产品：' + inp.topic + '\n'
+    + '核心卖点：' + inp.objective + '\n'
+    + '关键词：' + inp.keywords + '\n'
+    + '文案风格：' + inp.tone + '\n\n'
+    + '请生成' + count + '篇文案，必须遵守以下所有要求：\n\n'
+    + '【去AI化要求（最重要）】\n'
+    + '- 句子长短随意不均匀，有时一句很长有时就几个字\n'
+    + '- 多用口语：哈哈哈、呜呜、啊啊啊、真的绝了、不行了、救命\n'
+    + '- 禁止用首先其次最后、综上所述、总的来说这类词\n'
+    + '- 加入具体生活场景：那天在地铁上、我室友问我、男朋友说\n'
+    + '- 数字要模糊：用了大概十几天而不是使用14天后\n'
+    + '- 加一两句小吐槽或自我怀疑，不完美才真实\n'
+    + '- 情绪要有起伏，不要一直正面积极\n'
+    + '- 段落长短不均匀，不要整整齐齐\n\n'
+    + '【合规要求（必须遵守）】\n'
+    + '- 绝对不能出现：治疗、根治、特效、第一、最好、100%等绝对化词汇\n'
+    + '- 用辅助调理、改善不适、感觉好多了等合规表达\n'
+    + '- 不能有医疗声称\n\n'
     + '【标题要求】每篇用不同风格，口语化：\n'
-    + '1. 体验感："泡进去的那一刻，我就知道值了"\n'
-    + '2. 传承感："流传了几百年的瑶族秘方，原来是这个感觉"\n'
-    + '3. 对比感："试了很多方法，没想到最管用的是这个"\n'
-    + '4. 人群共鸣："同样是' + selectedScene + '，你试过这个吗"\n'
-    + '5. 好奇钩子："广西人从小就在泡，外省人却不知道"\n\n'
-    + '话题标签：10个，包含瑶医、壮医、' + selectedType + '、' + selectedScene + '相关标签，大小标签混合\n\n'
-    + '请严格用JSON格式返回，不要有任何多余文字：\n'
+    + '1. 折腾好久终于找到了！！\n'
+    + '2. 用了差不多一个月，真的有点不一样了\n'
+    + '3. 本来不抱希望的，结果...\n'
+    + '4. 闺蜜问我最近状态怎么这么好\n'
+    + '5. 贵的用完了，反而开始回购这个\n\n'
+    + '话题标签：8-10个，大标签和精准小标签混合\n\n'
+    + '严格用JSON格式返回，不要有任何多余文字：\n'
     + '{"posts":[' + arr.join(',') + ']}';
 }
 
-function buildScoringPrompt(posts) {
+function buildScoringPrompt(posts, inp) {
   var postsText = posts.map(function(p, i) {
     return '【版本' + (i+1) + '】标题：' + p.title + '\n开头：' + p.opening;
   }).join('\n\n');
   var scoresTpl = posts.map(function(_, i) {
     return '{"index":' + i + ',"score":0,"reason":""}';
   }).join(',');
-  return '你是小红书养生内容专家，对以下' + posts.length + '篇瑶医壮医文案评分。\n\n'
+  return '你是小红书算法专家，对以下' + posts.length + '篇文案进行爆款潜力评分。\n\n'
+    + '产品：' + inp.topic + '\n\n'
     + postsText + '\n\n'
-    + '评分维度满分100：体验感真实度30分、文化传承感25分、人群共鸣25分、合规性20分\n\n'
-    + '请用JSON格式返回，不要有任何多余文字：\n'
+    + '评分满分100：标题吸引力30分、真实感25分、情感共鸣25分、互动引导20分\n\n'
+    + '严格用JSON格式返回，不要有任何多余文字：\n'
     + '{"scores":[' + scoresTpl + '],"best_index":0}';
 }
 
 async function callGemini(prompt) {
   var apiKey = document.getElementById('apiKey').value.trim();
-  localStorage.setItem('yaoyao_api_key', apiKey);
+  localStorage.setItem('xhs_api_key', apiKey);
   var resp = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + apiKey, {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
@@ -317,13 +332,18 @@ async function generate(count) {
   setLoading(true);
   document.getElementById('error').classList.remove('show');
   document.getElementById('results').innerHTML = '';
-  var steps = ['正在生成' + count + '篇文案...', '整理结果...'];
+  var steps = ['正在生成' + count + '篇文案...', '违禁词检测...', '整理结果...'];
   setStep(steps, 0);
   try {
-    var extra = document.getElementById('extra').value.trim();
-    var tone = document.getElementById('tone').value;
-    var parsed = await callGemini(buildPrompt(count, extra, tone));
+    var inp = getInputs();
+    var parsed = await callGemini(buildPrompt(count, inp));
     setStep(steps, 1);
+    parsed.posts = parsed.posts.map(function(p) {
+      p._banned = checkBannedWords(p.title + p.opening + p.body + p.cta);
+      return p;
+    });
+    setStep(steps, 2);
+    saveHistory(inp.topic, selectedType, selectedAudience);
     renderResults(parsed.posts, null, null);
   } catch(e) { showError('生成失败：' + e.message); }
   finally { setLoading(false); }
@@ -334,15 +354,20 @@ async function generateBest() {
   setLoading(true);
   document.getElementById('error').classList.remove('show');
   document.getElementById('results').innerHTML = '';
-  var steps = ['正在生成10篇候选文案...', 'AI 正在评分...', '选出最优版本...'];
+  var steps = ['正在生成10篇候选文案...', 'AI 正在评分...', '违禁词检测...', '选出最优版本...'];
   setStep(steps, 0);
   try {
-    var extra = document.getElementById('extra').value.trim();
-    var tone = document.getElementById('tone').value;
-    var parsed = await callGemini(buildPrompt(10, extra, tone));
+    var inp = getInputs();
+    var parsed = await callGemini(buildPrompt(10, inp));
     setStep(steps, 1);
-    var scoring = await callGemini(buildScoringPrompt(parsed.posts));
+    var scoring = await callGemini(buildScoringPrompt(parsed.posts, inp));
     setStep(steps, 2);
+    parsed.posts = parsed.posts.map(function(p) {
+      p._banned = checkBannedWords(p.title + p.opening + p.body + p.cta);
+      return p;
+    });
+    setStep(steps, 3);
+    saveHistory(inp.topic, selectedType, selectedAudience);
     renderResults(parsed.posts, scoring.scores, scoring.best_index);
   } catch(e) { showError('生成失败：' + e.message); }
   finally { setLoading(false); }
@@ -361,7 +386,7 @@ function renderResults(posts, scores, bestIdx) {
     candSection.className = 'candidates-section';
     showBtn.onclick = function() {
       candSection.classList.toggle('open');
-      showBtn.textContent = candSection.classList.contains('open') ? '收起候选' : '📋 查看全部10篇候选';
+      showBtn.textContent = candSection.classList.contains('open') ? '收起候选文案' : '📋 查看全部10篇候选';
     };
     var sorted = scores.slice().sort(function(a,b){ return b.score - a.score; });
     sorted.forEach(function(s) {
@@ -369,7 +394,8 @@ function renderResults(posts, scores, bestIdx) {
       var p = posts[s.index];
       var c = document.createElement('div');
       c.className = 'candidate-card';
-      c.innerHTML = '<div class="candidate-num">候选 ' + (s.index+1) + ' · ' + s.score + '分</div>'
+      c.innerHTML = '<div class="candidate-num">候选 ' + (s.index+1) + ' · ' + s.score + '分'
+        + (p._banned && p._banned.length ? ' ⚠️ 含违禁词' : '') + '</div>'
         + '<div class="candidate-title">' + esc(p.title) + '</div>'
         + '<div class="candidate-preview">' + esc(p.opening) + '</div>';
       c.onclick = function() {
@@ -393,9 +419,16 @@ function makeCard(post, isBest, scoreObj, label) {
   var full = post.title + '\n\n' + post.opening + '\n\n' + post.body + '\n\n' + post.cta + '\n\n'
     + post.hashtags.map(function(t){ return t.startsWith('#')?t:'#'+t; }).join(' ');
   var fullEsc = full.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\n/g,'\\n');
+
+  var bannedHtml = '';
+  if (post._banned && post._banned.length > 0) {
+    bannedHtml = '<div class="warn-box show"><div class="warn-title">⚠️ 检测到违禁词，建议修改后发布</div>发现：' + post._banned.map(function(w){ return '<b>' + w + '</b>'; }).join('、') + '</div>';
+  }
+
   card.innerHTML = (isBest ? '<div class="best-badge">🏆 AI 评选最优</div>' : '')
-    + (label ? '<div style="font-size:12px;color:#8b4513;font-weight:600;margin-bottom:10px;">' + label + '</div>' : '')
+    + (label ? '<div style="font-size:12px;color:#ff2442;font-weight:600;margin-bottom:10px;">' + label + '</div>' : '')
     + (scoreObj ? '<div class="score-bar"><span class="score-label">爆款潜力</span><div class="score-track"><div class="score-fill" style="width:' + Math.min(scoreObj.score,100) + '%"></div></div><span class="score-num">' + scoreObj.score + '分</span></div><div class="score-reason">💡 ' + esc(scoreObj.reason) + '</div>' : '')
+    + bannedHtml
     + '<div class="result-label">📌 标题</div>'
     + '<div class="result-title">' + esc(post.title) + '</div>'
     + '<div class="result-label">🎯 开头</div>'
@@ -416,6 +449,59 @@ function copyText(btn, text) {
     btn.textContent = '✅ 已复制！';
     setTimeout(function(){ btn.textContent = '📋 一键复制全文'; }, 2000);
   });
+}
+
+function saveHistory(topic, type, audience) {
+  var history = JSON.parse(localStorage.getItem('xhs_history') || '[]');
+  history.unshift({
+    topic: topic, type: type, audience: audience,
+    time: new Date().toLocaleString('zh-CN', {month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})
+  });
+  if (history.length > 20) history = history.slice(0, 20);
+  localStorage.setItem('xhs_history', JSON.stringify(history));
+  renderHistory();
+}
+
+function renderHistory() {
+  var history = JSON.parse(localStorage.getItem('xhs_history') || '[]');
+  var card = document.getElementById('historyCard');
+  var list = document.getElementById('historyList');
+  if (history.length === 0) { card.style.display = 'none'; return; }
+  card.style.display = 'block';
+  list.innerHTML = history.map(function(h, i) {
+    return '<div class="history-item" onclick="loadHistory(' + i + ')">'
+      + '<div class="history-text">' + esc(h.type) + ' · ' + esc(h.topic) + ' · ' + esc(h.audience) + '</div>'
+      + '<div class="history-time">' + h.time + '</div>'
+      + '<div class="history-del" onclick="deleteHistory(event,' + i + ')">✕</div>'
+      + '</div>';
+  }).join('');
+}
+
+function loadHistory(idx) {
+  var history = JSON.parse(localStorage.getItem('xhs_history') || '[]');
+  var h = history[idx];
+  if (!h) return;
+  document.getElementById('topic').value = h.topic;
+  document.querySelectorAll('.sel-btn:not(.sm)').forEach(function(b){ b.classList.remove('active'); });
+  document.querySelectorAll('.sel-btn:not(.sm)').forEach(function(b){
+    if (b.textContent.indexOf(h.type) !== -1) b.classList.add('active');
+  });
+  selectedType = h.type;
+  selectedAudience = h.audience;
+  window.scrollTo(0, 0);
+}
+
+function deleteHistory(e, idx) {
+  e.stopPropagation();
+  var history = JSON.parse(localStorage.getItem('xhs_history') || '[]');
+  history.splice(idx, 1);
+  localStorage.setItem('xhs_history', JSON.stringify(history));
+  renderHistory();
+}
+
+function clearHistory() {
+  localStorage.removeItem('xhs_history');
+  renderHistory();
 }
 
 function esc(s) {
