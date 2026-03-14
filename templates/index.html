@@ -10,64 +10,78 @@
     .container{max-width:720px;margin:0 auto;}
     h1{font-size:22px;font-weight:700;color:#ff2442;margin-bottom:4px;}
     .subtitle{font-size:13px;color:#999;margin-bottom:24px;}
-
     .card{background:#fff;border-radius:16px;padding:20px;margin-bottom:16px;box-shadow:0 2px 12px rgba(255,36,66,0.06);}
     .card-title{font-size:13px;font-weight:600;color:#ff2442;margin-bottom:14px;letter-spacing:0.5px;}
-
     label{display:block;font-size:13px;color:#666;margin-bottom:4px;margin-top:12px;}
     label:first-of-type{margin-top:0;}
     input,textarea,select{width:100%;padding:10px 12px;border:1px solid #ffe0e6;border-radius:10px;font-size:14px;color:#333;background:#fff;outline:none;transition:border 0.2s;}
     input:focus,textarea:focus,select:focus{border-color:#ff2442;}
     textarea{resize:vertical;min-height:72px;line-height:1.6;}
     input[type="password"]{letter-spacing:2px;}
-
     .key-row{display:flex;gap:8px;align-items:center;}
     .key-row input{flex:1;}
     .key-toggle{font-size:12px;color:#ff2442;cursor:pointer;white-space:nowrap;padding:10px 0;}
-
     .style-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px;}
     .style-btn{padding:10px;border:1.5px solid #ffe0e6;border-radius:10px;font-size:13px;color:#666;cursor:pointer;text-align:center;transition:all 0.15s;background:#fff;}
     .style-btn.active{border-color:#ff2442;color:#ff2442;background:#fff5f7;font-weight:600;}
-
-    .generate-btn{width:100%;padding:14px;background:#ff2442;color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;transition:opacity 0.15s;margin-top:4px;}
+    .btn-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+    .generate-btn{width:100%;padding:12px 8px;background:#ff2442;color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:600;cursor:pointer;transition:opacity 0.15s;}
     .generate-btn:hover{opacity:0.9;}
     .generate-btn:disabled{opacity:0.5;cursor:not-allowed;}
-
+    .generate-btn.secondary{background:#ff6b81;}
+    .generate-btn.premium{background:#ff6b35;}
     .result-card{background:#fff;border-radius:16px;padding:20px;margin-bottom:16px;box-shadow:0 2px 12px rgba(255,36,66,0.08);border-left:4px solid #ff2442;display:none;}
     .result-card.show{display:block;}
+    .result-card.best{border-left:4px solid #ff6b35;box-shadow:0 4px 20px rgba(255,107,53,0.15);}
+    .best-badge{display:inline-block;background:#ff6b35;color:#fff;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;margin-bottom:12px;}
+    .score-bar{display:flex;align-items:center;gap:8px;margin:8px 0 14px;}
+    .score-label{font-size:12px;color:#999;white-space:nowrap;}
+    .score-track{flex:1;height:6px;background:#ffe0e6;border-radius:3px;}
+    .score-fill{height:6px;background:#ff2442;border-radius:3px;}
+    .score-num{font-size:12px;font-weight:600;color:#ff2442;white-space:nowrap;}
+    .score-reason{font-size:12px;color:#999;line-height:1.6;margin-bottom:12px;padding:8px 12px;background:#fff5f7;border-radius:8px;}
     .result-label{font-size:12px;color:#ff2442;font-weight:600;margin-bottom:6px;margin-top:14px;}
     .result-label:first-of-type{margin-top:0;}
     .result-content{font-size:14px;color:#333;line-height:1.8;white-space:pre-wrap;}
     .result-title{font-size:17px;font-weight:700;color:#ff2442;line-height:1.5;}
     .hashtags{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;}
     .tag{background:#fff5f7;color:#ff2442;font-size:12px;padding:4px 10px;border-radius:20px;border:1px solid #ffe0e6;}
-
     .copy-btn{margin-top:14px;padding:10px 20px;border:1.5px solid #ff2442;border-radius:10px;color:#ff2442;background:#fff;font-size:13px;cursor:pointer;font-weight:600;}
     .copy-btn:hover{background:#fff5f7;}
-
+    .show-all-btn{width:100%;padding:12px;border:1.5px dashed #ffb3c0;border-radius:12px;color:#ff2442;background:transparent;font-size:13px;cursor:pointer;margin-bottom:16px;}
+    .show-all-btn:hover{background:#fff5f7;}
+    .candidates-section{display:none;}
+    .candidates-section.show{display:block;}
+    .candidate-card{background:#fff;border-radius:12px;padding:16px;margin-bottom:10px;border:1px solid #ffe0e6;cursor:pointer;}
+    .candidate-card:hover{background:#fff5f7;}
+    .candidate-num{font-size:11px;color:#999;margin-bottom:6px;}
+    .candidate-title{font-size:14px;font-weight:600;color:#333;margin-bottom:6px;}
+    .candidate-preview{font-size:12px;color:#999;line-height:1.6;}
     .loading{text-align:center;padding:24px;color:#ff2442;font-size:14px;display:none;}
     .loading.show{display:block;}
+    .loading-steps{margin-top:12px;}
+    .loading-step{font-size:12px;color:#ccc;margin:4px 0;}
+    .loading-step.active{color:#ff2442;}
+    .loading-step.done{color:#52c41a;}
     .dot{animation:blink 1.2s infinite;}
     .dot:nth-child(2){animation-delay:0.2s;}
     .dot:nth-child(3){animation-delay:0.4s;}
     @keyframes blink{0%,80%,100%{opacity:0;}40%{opacity:1;}}
-
     .error{background:#fff0f0;border:1px solid #ffb3b3;border-radius:10px;padding:12px;color:#cc0000;font-size:13px;margin-top:12px;display:none;}
     .error.show{display:block;}
-
     .tip{background:#fff5f7;border-radius:10px;padding:10px 12px;font-size:12px;color:#999;line-height:1.6;margin-top:8px;}
   </style>
 </head>
 <body>
 <div class="container">
   <h1>🌸 小红书爆款文案生成器</h1>
-  <p class="subtitle">Gemini 驱动 · 种草测评 · 生活方式</p>
+  <p class="subtitle">Gemini 驱动 · AI评分选优 · 种草测评 · 生活方式</p>
 
   <div class="card">
     <div class="card-title">🔑 API 设置</div>
-    <label>Anthropic API Key</label>
+    <label>Gemini API Key</label>
     <div class="key-row">
-      <input type="password" id="apiKey" placeholder="AIzaSy..." />
+      <input type="password" id="apiKey" placeholder="AIzaSy..."/>
       <span class="key-toggle" onclick="toggleKey()">显示</span>
     </div>
     <div class="tip">Key 仅保存在你的浏览器本地，不会上传到任何服务器。免费额度每天可用。</div>
@@ -75,7 +89,6 @@
 
   <div class="card">
     <div class="card-title">✏️ 内容设置</div>
-
     <label>内容类型</label>
     <div class="style-grid">
       <div class="style-btn active" onclick="selectType(this,'种草测评')">🛍️ 种草测评</div>
@@ -83,19 +96,14 @@
       <div class="style-btn" onclick="selectType(this,'经验分享')">💡 经验分享</div>
       <div class="style-btn" onclick="selectType(this,'好物推荐')">⭐ 好物推荐</div>
     </div>
-
     <label>主题 / 产品</label>
-    <input type="text" id="topic" placeholder="例如：韩国护肤品 COSRX 蜗牛霜" />
-
+    <input type="text" id="topic" placeholder="例如：韩国护肤品 COSRX 蜗牛霜"/>
     <label>目标受众</label>
-    <input type="text" id="audience" placeholder="例如：25-35岁爱护肤的女生" />
-
+    <input type="text" id="audience" placeholder="例如：25-35岁爱护肤的女生"/>
     <label>核心卖点 / 想传达的感受</label>
     <textarea id="objective" placeholder="例如：亲测有效、平价好用、敏感肌也能用、半个月皮肤变好了"></textarea>
-
     <label>关键词（逗号分隔）</label>
-    <input type="text" id="keywords" placeholder="例如：平价好物,护肤,敏感肌,素颜" />
-
+    <input type="text" id="keywords" placeholder="例如：平价好物,护肤,敏感肌,素颜"/>
     <label>文案风格</label>
     <select id="tone">
       <option value="真实闺蜜分享">真实闺蜜分享（最受欢迎）</option>
@@ -108,17 +116,18 @@
 
   <div class="card">
     <div class="card-title">🚀 生成选项</div>
-    <div class="style-grid">
+    <div class="btn-grid">
       <button class="generate-btn" onclick="generate(1)" id="btn1">生成 1 篇</button>
-      <button class="generate-btn" style="background:#ff6b81;" onclick="generate(3)" id="btn3">生成 3 篇对比</button>
+      <button class="generate-btn secondary" onclick="generate(3)" id="btn3">生成 3 篇</button>
+      <button class="generate-btn premium" onclick="generateBest()" id="btn10">✨ 10篇AI选优</button>
     </div>
+    <div class="tip" style="margin-top:12px;">✨ 「10篇AI选优」生成10篇候选，AI评分选出爆款概率最高的，效果最好但耗时约30~60秒。</div>
   </div>
 
   <div class="loading" id="loading">
     <p>AI 正在创作爆款文案<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></p>
-    <p style="font-size:12px;color:#ccc;margin-top:6px;">通常需要 10~20 秒</p>
+    <div class="loading-steps" id="loadingSteps"></div>
   </div>
-
   <div class="error" id="error"></div>
   <div id="results"></div>
 </div>
@@ -134,14 +143,8 @@ function selectType(el, type) {
 
 function toggleKey() {
   const inp = document.getElementById('apiKey');
-  const btn = event.target;
-  if (inp.type === 'password') { inp.type = 'text'; btn.textContent = '隐藏'; }
-  else { inp.type = 'password'; btn.textContent = '显示'; }
-}
-
-function saveKey() {
-  const k = document.getElementById('apiKey').value.trim();
-  if (k) localStorage.setItem('xhs_api_key', k);
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+  event.target.textContent = inp.type === 'password' ? '显示' : '隐藏';
 }
 
 window.onload = () => {
@@ -149,124 +152,198 @@ window.onload = () => {
   if (saved) document.getElementById('apiKey').value = saved;
 };
 
-function buildPrompt(count) {
-  const topic = document.getElementById('topic').value.trim();
-  const audience = document.getElementById('audience').value.trim();
-  const objective = document.getElementById('objective').value.trim();
-  const keywords = document.getElementById('keywords').value.trim();
-  const tone = document.getElementById('tone').value;
+function getInputs() {
+  return {
+    topic: document.getElementById('topic').value.trim(),
+    audience: document.getElementById('audience').value.trim(),
+    objective: document.getElementById('objective').value.trim(),
+    keywords: document.getElementById('keywords').value.trim(),
+    tone: document.getElementById('tone').value,
+  };
+}
 
-  return `你是一位拥有百万粉丝的小红书爆款博主，擅长写让人忍不住点赞收藏的文案。
+function validate() {
+  const inp = getInputs();
+  const apiKey = document.getElementById('apiKey').value.trim();
+  if (!apiKey) { showError('请先填写 API Key'); return false; }
+  if (!inp.topic) { showError('请填写主题/产品'); return false; }
+  if (!inp.audience) { showError('请填写目标受众'); return false; }
+  if (!inp.objective) { showError('请填写核心卖点'); return false; }
+  return true;
+}
+
+function buildPrompt(count, inp) {
+  const postTemplate = '{"title":"标题","opening":"开头钩子2-3句","body":"正文内容","cta":"互动引导结尾","hashtags":["标签1","标签2"]}';
+  return `你是拥有500万粉丝的小红书顶级爆款博主，深度研究过10000+篇爆款笔记的规律。
 
 请根据以下信息，生成${count}篇高质量小红书爆款文案：
 
 内容类型：${selectedType}
-主题/产品：${topic}
-目标受众：${audience}
-核心卖点：${objective}
-关键词：${keywords}
-文案风格：${tone}
+主题/产品：${inp.topic}
+目标受众：${inp.audience}
+核心卖点：${inp.objective}
+关键词：${inp.keywords}
+文案风格：${inp.tone}
 
-爆款标题要求（必须符合以下其中一种公式）：
-- 痛点型："我熬了3个月才发现，${topic}这样用才对！"
-- 好奇型："为什么很多人用了${topic}之后再也不想换？"
-- 对比型："花了XXX买了很多，最后只留下了${topic}"
-- 数字型："用了30天，${topic}让我皮肤变化超明显"
-- 反转型："劝你别买${topic}！除非你也想..."
+【爆款标题公式】每篇必须用不同公式：
+1. 痛点共鸣型："我折腾了5年，才找到这个平价神器"
+2. 数字冲击型："用了30天，变化好到连身边人都注意到了"
+3. 反转悬念型："劝你先别买！除非你也想被追问同款"
+4. 对比反差型："花了大价钱买大牌，最后被平价的它打败了"
+5. 好奇钩子型："为什么内行人都偷偷在用这个？"
 
-正文要求：
-- 开头必须有钩子（共鸣/痛点/好奇心）
-- 用真实体验感的语气，像在跟闺蜜聊天
-- 有具体细节和使用感受，不能太泛
-- 自然融入关键词，不生硬
-- 结尾要有互动引导（问问题或让人评论）
-- 适当使用emoji让内容更生动
-- 字数在300-500字之间
+【正文要求】
+- 开头3行必须有强钩子，让人忍不住看下去
+- 用第一人称真实体验感，像闺蜜聊天不像广告
+- 有具体细节（时间/次数/前后对比变化）
+- 自然融入关键词，不生硬堆砌
+- 适当使用emoji增加可读性
+- 结尾必须有互动引导，引发评论
+- 字数350-500字
 
-话题标签：给出8-10个精准标签，混合大标签和小标签
+【话题标签】8-10个，混合大标签和精准小标签
 
-请用以下JSON格式返回，不要有任何多余文字：
-${count === 1 ? `{
-  "posts": [
-    {
-      "title": "标题",
-      "opening": "开头钩子（1-2句）",
-      "body": "正文内容",
-      "cta": "互动引导结尾",
-      "hashtags": ["标签1", "标签2"]
-    }
-  ]
-}` : `{
-  "posts": [
-    {"title": "版本1标题", "opening": "开头", "body": "正文", "cta": "结尾", "hashtags": ["标签"]},
-    {"title": "版本2标题", "opening": "开头", "body": "正文", "cta": "结尾", "hashtags": ["标签"]},
-    {"title": "版本3标题", "opening": "开头", "body": "正文", "cta": "结尾", "hashtags": ["标签"]}
-  ]
-}`}`;
+请严格用以下JSON格式返回，不要有任何多余文字：
+{"posts":[${Array(count).fill(postTemplate).join(',')}]}`;
+}
+
+function buildScoringPrompt(posts, inp) {
+  const postsText = posts.map((p, i) => `【版本${i+1}】\n标题：${p.title}\n开头：${p.opening}`).join('\n\n');
+  return `你是小红书算法专家，请对以下${posts.length}篇文案进行爆款潜力评分。
+
+产品：${inp.topic}，目标受众：${inp.audience}
+
+${postsText}
+
+评分维度（满分100）：标题吸引力30分、内容真实感25分、情感共鸣25分、互动引导20分
+
+请用JSON格式返回，不要有任何多余文字：
+{"scores":[${posts.map((_,i)=>`{"index":${i},"score":0,"reason":"评分理由"}`).join(',')}],"best_index":0}`;
+}
+
+async function callGemini(prompt) {
+  const apiKey = document.getElementById('apiKey').value.trim();
+  localStorage.setItem('xhs_api_key', apiKey);
+  const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-04-17:generateContent?key=${apiKey}`, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      contents: [{parts: [{text: prompt}]}],
+      generationConfig: {maxOutputTokens: 4000, temperature: 0.9}
+    })
+  });
+  if (!resp.ok) {
+    const err = await resp.json();
+    throw new Error(err.error?.message || `请求失败 ${resp.status}`);
+  }
+  const data = await resp.json();
+  const text = data.candidates[0].content.parts[0].text.replace(/```json|```/g, '').trim();
+  return JSON.parse(text);
+}
+
+function setStep(steps, activeIdx) {
+  document.getElementById('loadingSteps').innerHTML = steps.map((s, i) => {
+    let cls = 'loading-step';
+    if (i < activeIdx) cls += ' done';
+    else if (i === activeIdx) cls += ' active';
+    const icon = i < activeIdx ? '✓' : i === activeIdx ? '→' : '·';
+    return `<div class="${cls}">${icon} ${s}</div>`;
+  }).join('');
 }
 
 async function generate(count) {
-  const apiKey = document.getElementById('apiKey').value.trim();
-  if (!apiKey) { showError('请先填写 API Key'); return; }
-  if (!document.getElementById('topic').value.trim()) { showError('请填写主题/产品'); return; }
-  if (!document.getElementById('audience').value.trim()) { showError('请填写目标受众'); return; }
-  if (!document.getElementById('objective').value.trim()) { showError('请填写核心卖点'); return; }
-
-  saveKey();
+  if (!validate()) return;
   setLoading(true);
   document.getElementById('error').classList.remove('show');
   document.getElementById('results').innerHTML = '';
-
+  setStep([`正在生成${count}篇文案...`, '整理结果...'], 0);
   try {
-    const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-04-17:generateContent?key=${apiKey}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: buildPrompt(count) }] }],
-        generationConfig: { maxOutputTokens: 2000, temperature: 0.9 }
-      })
+    const inp = getInputs();
+    const parsed = await callGemini(buildPrompt(count, inp));
+    setStep([`正在生成${count}篇文案...`, '整理结果...'], 1);
+    renderResults(parsed.posts, null, null);
+  } catch(e) { showError('生成失败：' + e.message); }
+  finally { setLoading(false); }
+}
+
+async function generateBest() {
+  if (!validate()) return;
+  setLoading(true);
+  document.getElementById('error').classList.remove('show');
+  document.getElementById('results').innerHTML = '';
+  const steps = ['正在生成10篇候选文案...', 'AI 正在评分分析...', '选出爆款最优版本...'];
+  setStep(steps, 0);
+  try {
+    const inp = getInputs();
+    const parsed = await callGemini(buildPrompt(10, inp));
+    setStep(steps, 1);
+    const scoring = await callGemini(buildScoringPrompt(parsed.posts, inp));
+    setStep(steps, 2);
+    renderResults(parsed.posts, scoring.scores, scoring.best_index);
+  } catch(e) { showError('生成失败：' + e.message); }
+  finally { setLoading(false); }
+}
+
+function renderResults(posts, scores, bestIdx) {
+  const box = document.getElementById('results');
+  box.innerHTML = '';
+
+  if (scores !== null) {
+    box.appendChild(makeCard(posts[bestIdx], true, scores[bestIdx]));
+
+    const showBtn = document.createElement('button');
+    showBtn.className = 'show-all-btn';
+    showBtn.textContent = '📋 查看全部10篇候选';
+    box.appendChild(showBtn);
+
+    const candSection = document.createElement('div');
+    candSection.className = 'candidates-section';
+    showBtn.onclick = () => {
+      candSection.classList.toggle('show');
+      showBtn.textContent = candSection.classList.contains('show') ? '收起候选文案' : '📋 查看全部10篇候选';
+    };
+
+    const sorted = [...scores].sort((a,b) => b.score - a.score);
+    sorted.forEach(s => {
+      if (s.index === bestIdx) return;
+      const p = posts[s.index];
+      const c = document.createElement('div');
+      c.className = 'candidate-card';
+      c.innerHTML = `<div class="candidate-num">候选 ${s.index+1} · ${s.score}分</div><div class="candidate-title">${esc(p.title)}</div><div class="candidate-preview">${esc(p.opening)}</div>`;
+      c.onclick = () => {
+        box.insertBefore(makeCard(p, false, s), showBtn);
+        candSection.classList.remove('show');
+      };
+      candSection.appendChild(c);
     });
-
-    if (!resp.ok) {
-      const err = await resp.json();
-      throw new Error(err.error?.message || `请求失败 ${resp.status}`);
-    }
-
-    const data = await resp.json();
-    const text = data.candidates[0].content.parts[0].text.replace(/```json|```/g, '').trim();
-    const parsed = JSON.parse(text);
-    renderResults(parsed.posts);
-  } catch(e) {
-    showError('生成失败：' + e.message);
-  } finally {
-    setLoading(false);
+    box.appendChild(candSection);
+  } else {
+    posts.forEach((p, i) => box.appendChild(makeCard(p, false, null, posts.length > 1 ? `版本 ${i+1}` : null)));
   }
 }
 
-function renderResults(posts) {
-  const box = document.getElementById('results');
-  box.innerHTML = '';
-  posts.forEach((post, i) => {
-    const card = document.createElement('div');
-    card.className = 'result-card show';
-    const tags = post.hashtags.map(t => `<span class="tag">${t.startsWith('#') ? t : '#'+t}</span>`).join('');
-    const full = `${post.title}\n\n${post.opening}\n\n${post.body}\n\n${post.cta}\n\n${post.hashtags.map(t=>t.startsWith('#')?t:'#'+t).join(' ')}`;
-    card.innerHTML = `
-      ${posts.length > 1 ? `<div style="font-size:12px;color:#ff2442;font-weight:600;margin-bottom:10px;">版本 ${i+1}</div>` : ''}
-      <div class="result-label">📌 标题</div>
-      <div class="result-title">${esc(post.title)}</div>
-      <div class="result-label">🎯 开头钩子</div>
-      <div class="result-content">${esc(post.opening)}</div>
-      <div class="result-label">📝 正文</div>
-      <div class="result-content">${esc(post.body)}</div>
-      <div class="result-label">💬 互动引导</div>
-      <div class="result-content">${esc(post.cta)}</div>
-      <div class="result-label">🏷️ 话题标签</div>
-      <div class="hashtags">${tags}</div>
-      <button class="copy-btn" onclick="copyText(this, ${JSON.stringify(full)})">📋 一键复制全文</button>
-    `;
-    box.appendChild(card);
-  });
+function makeCard(post, isBest, scoreObj, label) {
+  const card = document.createElement('div');
+  card.className = 'result-card show' + (isBest ? ' best' : '');
+  const tags = post.hashtags.map(t => `<span class="tag">${t.startsWith('#')?t:'#'+t}</span>`).join('');
+  const full = `${post.title}\n\n${post.opening}\n\n${post.body}\n\n${post.cta}\n\n${post.hashtags.map(t=>t.startsWith('#')?t:'#'+t).join(' ')}`;
+  card.innerHTML = `
+    ${isBest ? '<div class="best-badge">🏆 AI 评选最优</div>' : ''}
+    ${label ? `<div style="font-size:12px;color:#ff2442;font-weight:600;margin-bottom:10px;">${label}</div>` : ''}
+    ${scoreObj ? `<div class="score-bar"><span class="score-label">爆款潜力</span><div class="score-track"><div class="score-fill" style="width:${Math.min(scoreObj.score,100)}%"></div></div><span class="score-num">${scoreObj.score}分</span></div><div class="score-reason">💡 ${esc(scoreObj.reason)}</div>` : ''}
+    <div class="result-label">📌 标题</div>
+    <div class="result-title">${esc(post.title)}</div>
+    <div class="result-label">🎯 开头钩子</div>
+    <div class="result-content">${esc(post.opening)}</div>
+    <div class="result-label">📝 正文</div>
+    <div class="result-content">${esc(post.body)}</div>
+    <div class="result-label">💬 互动引导</div>
+    <div class="result-content">${esc(post.cta)}</div>
+    <div class="result-label">🏷️ 话题标签</div>
+    <div class="hashtags">${tags}</div>
+    <button class="copy-btn" onclick="copyText(this, ${JSON.stringify(full)})">📋 一键复制全文</button>
+  `;
+  return card;
 }
 
 function copyText(btn, text) {
@@ -276,20 +353,11 @@ function copyText(btn, text) {
   });
 }
 
-function esc(str) {
-  return (str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-
-function showError(msg) {
-  const el = document.getElementById('error');
-  el.textContent = msg;
-  el.classList.add('show');
-}
-
+function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function showError(msg) { const el=document.getElementById('error'); el.textContent=msg; el.classList.add('show'); }
 function setLoading(on) {
   document.getElementById('loading').classList.toggle('show', on);
-  document.getElementById('btn1').disabled = on;
-  document.getElementById('btn3').disabled = on;
+  ['btn1','btn3','btn10'].forEach(id => document.getElementById(id).disabled = on);
 }
 </script>
 </body>
