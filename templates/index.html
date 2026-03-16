@@ -91,7 +91,7 @@
 <body>
 <div class="container">
   <h1>🌸 小红书爆款文案生成器</h1>
-  <p class="subtitle">Gemini 2.5 Flash Lite 驱动 · 去AI化 · 违禁词检测 · 历史记录</p>
+  <p class="subtitle">Gemini 3.1 Flash Lite 驱动 · 去AI化 · 违禁词检测 · 历史记录</p>
 
   <div class="card">
     <div class="card-title">🔑 API 设置</div>
@@ -150,7 +150,7 @@
       <button class="gen-btn p2" onclick="generate(3)" id="btn3">生成 3 篇</button>
       <button class="gen-btn p3" onclick="generate(5)" id="btn10">生成 5 篇</button>
     </div>
-    <div class="tip" style="margin-top:12px;">使用 Gemini 2.5 Flash Lite 模型，免费额度每天可用。</div>
+    <div class="tip" style="margin-top:12px;">使用 Gemini 3.1 Flash Lite 模型，免费额度每天500次。</div>
   </div>
 
   <div class="loading" id="loading">
@@ -275,7 +275,7 @@ async function callGemini(prompt) {
   localStorage.setItem('xhs_api_key', apiKey);
 
   var resp = await fetch(
-    'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=' + apiKey,
+    'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite-preview:generateContent?key=' + apiKey,
     {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
