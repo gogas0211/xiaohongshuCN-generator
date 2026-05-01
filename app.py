@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, jsonify, render_template, request, abort
 
 from generator import (
     XiaohongshuRequest,
@@ -11,6 +11,13 @@ from generator import (
 )
 
 app = Flask(__name__)
+
+# ✅ 防护：拦截 UptimeRobot（关键）
+@app.before_request
+def block_uptime_robot():
+    ua = request.headers.get("User-Agent", "")
+    if "UptimeRobot" in ua:
+        abort(403)
 
 
 def _parse_keywords(raw_keywords: str) -> list[str]:
@@ -27,91 +34,42 @@ def _build_request(payload) -> XiaohongshuRequest:
     )
 
 
-def _post_to_dict(post):
-    return {
-        "title": post.title,
-        "opening": post.opening,
-        "body": post.body,
-        "cta": post.cta,
-        "hashtags": post.hashtags,
-    }
-
-
-@app.get("/")
+@app.route("/")
 def index():
-    return render_template(
-        "index.html",
-        result=None,
-        error=None,
-        multi_results=None,
-        best_result=None,
-    )
+    return render_template("index.html")
 
 
-@app.post("/generate")
-def generate():
-    is_json = request.is_json
-    payload = request.get_json(silent=True) or request.form
+@app.route("/api/generate", methods=["POST"])
+def api_generate():
+    payload = request.json or {}
     req = _build_request(payload)
-
-    try:
-        post = generate_post(req)
-    except ValueError as exc:
-        if is_json:
-            return jsonify({"error": str(exc)}), 400
-        return render_template(
-            "index.html",
-            result=None,
-            error=str(exc),
-            multi_results=None,
-            best_result=None,
-        ), 400
-
-    result = _post_to_dict(post)
-
-    if is_json:
-        return jsonify(result)
-
-    return render_template(
-        "index.html",
-        result=result,
-        error=None,
-        multi_results=None,
-        best_result=None,
-    )
+    post = generate_post(req)
+    return jsonify({"post": post})
 
 
-@app.post("/generate-multi")
-def generate_multi():
-    payload = request.get_json(silent=True) or request.form
+@app.route("/api/generate_three", methods=["POST"])
+def api_generate_three():
+    payload = request.json or {}
     req = _build_request(payload)
-
-    try:
-        posts = generate_three_posts(req)
-    except ValueError as exc:
-        return jsonify({"error": str(exc)}), 400
-
-    return jsonify({"versions": [_post_to_dict(post) for post in posts]})
+    posts = generate_three_posts(req)
+    return jsonify({"posts": posts})
 
 
-@app.post("/generate-best")
-def generate_best():
-    payload = request.get_json(silent=True) or request.form
+@app.route("/api/generate_ten", methods=["POST"])
+def api_generate_ten():
+    payload = request.json or {}
     req = _build_request(payload)
+    posts = generate_ten_posts(req)
+    return jsonify({"posts": posts})
 
-    try:
-        posts = generate_ten_posts(req)
-        best = select_best_post(posts)
-    except ValueError as exc:
-        return jsonify({"error": str(exc)}), 400
 
-    return jsonify(
-        {
-            "best": _post_to_dict(best),
-            "candidates": [_post_to_dict(post) for post in posts],
-        }
-    )
+@app.route("/api/select_best", methods=["POST"])
+def api_select_best():
+    payload = request.json or {}
+    posts = payload.get("posts", [])
+    best = select_best_post(posts)
+    return jsonify({"best": best})
 
 
 if __name__ == "__main__":
-    app.run(host="127.0.0.1", port=5000, debug=True)
+    app.run(debug=True)
